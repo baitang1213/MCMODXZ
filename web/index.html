@@ -1,0 +1,2166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>鸣潮mod下载链接整合器</title>
+<link rel="preconnect" href="https://images.gamebanana.com" crossorigin>
+<link rel="preconnect" href="https://staticdelivery.nexusmods.com" crossorigin>
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#121722; --panel2:#161c29; --line:#232c3f;
+    --text:#e8ecf4; --muted:#8b96ab; --dim:#66708a;
+    --accent:#40d0c2; --accent2:#5b8cff; --warn:#ffb454; --danger:#ff5f6d; --ok:#3ecf8e;
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 20% -10%, #14202e 0%, var(--bg) 55%) fixed, var(--bg);
+    color:var(--text);
+    font:14px/1.55 system-ui, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+  }
+  .wrap{max-width:1360px;margin:0 auto;padding:20px 20px 40px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .dim{color:var(--muted);font-size:12px}
+  .hidden{display:none !important}
+
+  /* ---------- 头部 ---------- */
+  header{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#40d0c2,#5b8cff);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:#0b0e14}
+  h1{font-size:18px;margin:0}
+  .sub{color:var(--muted);font-size:12px}
+  .stats{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+  .chip{background:var(--panel);border:1px solid var(--line);border-radius:999px;
+    padding:5px 12px;font-size:12px;color:var(--muted)}
+  .chip b{color:var(--text);font-weight:600;margin-left:4px}
+
+  /* ---------- 卡片与工具栏 ---------- */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:12px 14px;margin-bottom:14px}
+  .toolbar .row1{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .spacer{flex:1}
+  .btn{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px;
+    padding:7px 14px;font-size:13px;cursor:pointer;transition:.15s;white-space:nowrap}
+  .btnrow{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+  .btn:hover{border-color:#37435e;background:#1a2233}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.primary{background:linear-gradient(135deg,#2a6bff33,#2a6bff22);border-color:#2a6bff66;color:#9db9ff}
+  .btn.primary:hover{border-color:#2a6bff}
+  .btn.accent{background:linear-gradient(135deg,#40d0c233,#40d0c222);border-color:#40d0c266;color:#7ee8dd}
+  .btn.accent:hover{border-color:#40d0c2}
+  .btn.blue{background:linear-gradient(135deg,#5b8cff33,#5b8cff22);border-color:#5b8cff66;color:#a9bfff}
+  .btn.blue:hover{border-color:#5b8cff}
+  .btn.gold{background:linear-gradient(135deg,#ffb45433,#ffb45422);border-color:#ffb45466;color:#ffd9a0}
+  .btn.gold:hover{border-color:#ffb454}
+  .btn.danger{background:#ff5f6d22;border-color:#ff5f6d66;color:#ff98a1}
+  .btn.danger:hover{border-color:#ff5f6d}
+  .btn.xs{padding:3px 9px;font-size:12px;border-radius:6px}
+  .btn.ghost{background:transparent}
+  a.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+
+  /* ---------- 下拉菜单 ---------- */
+  .dd{position:relative}
+  .dd-panel{position:absolute;top:calc(100% + 6px);left:0;z-index:50;width:340px;
+    background:#151b28;border:1px solid var(--line);border-radius:10px;padding:12px;
+    box-shadow:0 14px 40px #000a;display:none}
+  .dd.open .dd-panel{display:block}
+  .dd-title{font-size:12px;color:var(--dim);margin:2px 0 8px;letter-spacing:.04em}
+  .dd-panel label{display:block;padding:4px 0;font-size:13px;cursor:pointer}
+  .dd-panel label input[type=radio],.dd-panel label input[type=checkbox]{accent-color:var(--accent);margin-right:6px}
+  .dd-panel hr{border:none;border-top:1px solid var(--line);margin:8px 0}
+  .dd-note{color:var(--warn);font-size:12px;margin:8px 0}
+  .w100{width:100%;margin-top:6px;text-align:center}
+  .inp-num{width:70px;background:var(--panel2);color:var(--text);border:1px solid var(--line);
+    border-radius:6px;padding:3px 6px}
+  .chk{display:inline-block !important;margin-left:10px}
+  .menu-item{display:block;width:100%;text-align:left;background:transparent;border:none;color:var(--text);
+    font-size:13px;padding:6px 8px;border-radius:6px;cursor:pointer}
+  .menu-item:hover{background:#1c2434}
+
+  /* ---------- 进度 ---------- */
+  .progress{margin-top:12px}
+  .bar{height:7px;border-radius:6px;background:#1b2333;overflow:hidden}
+  .bar i{display:block;height:100%;width:0%;border-radius:6px;
+    background:linear-gradient(90deg,#40d0c2,#5b8cff);transition:width .4s}
+  .ptext{margin-top:6px;font-size:12px;color:var(--muted)}
+
+  /* ---------- 筛选 ---------- */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .filters input[type=text],.filters select{background:var(--panel2);border:1px solid var(--line);
+    color:var(--text);border-radius:8px;padding:7px 10px;font-size:13px;outline:none}
+  .filters input[type=text]{flex:1;min-width:220px}
+  .filters select{cursor:pointer}
+  .filters input:focus,.filters select:focus{border-color:#3a4a6b}
+
+  /* ---------- 表格 ---------- */
+  .selbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;
+    padding-bottom:10px;border-bottom:1px solid var(--line);font-size:13px}
+  .tablewrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  table.mt{table-layout:fixed}
+  table.mt td{overflow:hidden}
+  thead th{position:sticky;top:0;background:var(--panel);color:var(--muted);font-weight:500;
+    text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);white-space:nowrap;z-index:5}
+  tbody td{padding:7px 8px;border-bottom:1px solid #1a2130;vertical-align:middle}
+  tbody tr:hover{background:#151c2a}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;color:#c6cede;white-space:nowrap}
+  .thumb{width:110px}
+  .thumb img{width:100px;height:60px;object-fit:cover;border-radius:6px;display:block;
+    background:#0e131d;cursor:zoom-in}
+  .thumb img.blurred{filter:blur(12px)}
+  .thumb .ph{width:100px;height:60px;border-radius:6px;background:#1a2233;display:flex;
+    align-items:center;justify-content:center;color:var(--dim);font-size:11px}
+  .badge{display:inline-block;font-size:11px;border:1px solid var(--line);border-radius:5px;
+    padding:0 6px;margin-left:6px;color:var(--muted);vertical-align:1px;white-space:nowrap}
+  .namerow{display:flex;align-items:center;gap:6px;min-width:0}
+  .namerow>a{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  .namerow .badge{flex:none;margin-left:0}
+  .badge.warn{border-color:#ffb45466;color:var(--warn)}
+  .badge.ok{border-color:#3ecf8e66;color:var(--ok)}
+  .badge.bad{border-color:#ff5f6d66;color:var(--danger)}
+  tr.exp>td{background:#101722;padding:0}
+  .files{padding:12px 14px}
+  .files h4{margin:0 0 8px;font-size:13px;color:var(--muted);font-weight:500}
+  table.ft{font-size:12.5px;table-layout:fixed;width:100%}
+  table.ft th{padding:6px 8px;text-align:left;border-bottom:1px solid #232c3f;font-weight:600;
+    color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  table.ft td{padding:6px 8px;border-bottom:1px solid #1a2130;overflow:hidden;text-overflow:ellipsis}
+  table.ft th.num,table.ft td.num{text-align:right}
+  table.ft td .btnrow{flex-wrap:wrap;justify-content:flex-end;gap:6px}
+  table.ft td .btn.xs{min-width:46px;justify-content:center}
+  .empty{padding:60px 20px;text-align:center;color:var(--muted)}
+  .empty .big{font-size:15px;color:var(--text);margin-bottom:8px}
+  .pager{display:flex;gap:10px;align-items:center;justify-content:center;padding-top:12px;font-size:13px}
+  .pager button{background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:7px;padding:5px 12px;cursor:pointer}
+  .pager button:disabled{opacity:.4;cursor:not-allowed}
+  .pager input{width:64px;background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:7px;padding:5px 8px;text-align:center}
+
+  /* ---------- 顶部标签页与任务卡片 ---------- */
+  .tabbar{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+  .tab{background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    border-radius:10px;padding:8px 16px;font-size:13.5px;cursor:pointer;transition:.15s}
+  .tab:hover{color:var(--text);border-color:#37435e}
+  .tab.active{background:#16202e;border-color:#40d0c288;color:var(--text)}
+  .tab .cnt{color:var(--dim);font-size:12px;margin-left:6px}
+  .keybox{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+  .keybox input{flex:1;min-width:260px;background:var(--panel2);border:1px solid var(--line);
+    color:var(--text);border-radius:8px;padding:7px 10px;font-size:13px;outline:none}
+  .keybox input:focus{border-color:#3a4a6b}
+  .statusline{font-size:12px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
+  .nxdl{display:inline-block;margin-left:6px}
+
+  /* ---------- 简介与翻译 ---------- */
+  .descbox{background:#0f1520;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+  .deschead{display:flex;gap:8px;align-items:center;cursor:pointer;user-select:none}
+  .deschead:hover b{color:var(--accent)}
+  .deschead .btn{white-space:nowrap}
+  .mirrorbox{margin-top:8px;border:1px dashed var(--line);border-radius:8px;padding:8px 10px}
+  .mirrorrow{display:flex;gap:6px;align-items:center;margin:3px 0}
+  .mtag{background:linear-gradient(135deg,#5b8cff33,#5b8cff22);border:1px solid #5b8cff66;color:#a9bfff;
+    border-radius:6px;padding:1px 8px;font-size:11px;white-space:nowrap}
+  .dlitem{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px}
+  .dlbar{height:6px;background:#0e131d;border-radius:4px;overflow:hidden;margin:4px 0}
+  .dlbar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+  .descprev{margin:0 0 10px}
+  .descprev img{display:block;margin:0 auto;max-width:100%;max-height:460px;width:auto;height:auto;
+    border-radius:8px;cursor:zoom-in;background:#0e131d}
+  .desctext{white-space:pre-wrap;font-size:12.5px;line-height:1.7;color:#c9d2e3;max-height:280px;overflow:auto}
+  .desctext.zh{color:#e4ecfb;border-top:1px dashed var(--line);margin-top:8px;padding-top:8px}
+
+  /* ---------- 更新提醒横幅 ---------- */
+  .updatebar{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:120;
+    background:#1b2434;border:1px solid #40d0c288;border-radius:999px;padding:8px 16px;font-size:13px;
+    box-shadow:0 10px 30px #000a;display:flex;gap:10px;align-items:center}
+
+  /* ---------- 放大看图 ---------- */
+  #imgModal{align-items:center}
+  .imgbox{max-width:94vw;max-height:92vh;display:flex;flex-direction:column;align-items:center;gap:8px}
+  #imgModalImg{max-width:94vw;max-height:82vh;border-radius:8px;box-shadow:0 20px 60px #000c;
+    background:#0e131d;cursor:zoom-out}
+  #imgModalImg.blurred{filter:blur(28px);cursor:zoom-in}
+  .imgcap{color:#cfd6e4;font-size:13px;text-shadow:0 1px 4px #000;text-align:center;max-width:90vw}
+
+  /* ---------- 设置弹窗 ---------- */
+  .modal{position:fixed;inset:0;background:#000a;z-index:90;display:flex;align-items:center;
+    justify-content:center;padding:24px}
+  .modal-card{background:#151b28;border:1px solid var(--line);border-radius:12px;padding:18px 20px;
+    width:min(600px,94vw);max-height:86vh;overflow:auto;box-shadow:0 20px 60px #000c}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .modal-head b{font-size:15px}
+  .sec-title{font-size:12px;color:var(--dim);margin:16px 0 8px;letter-spacing:.06em}
+
+  /* ---------- 其它 ---------- */
+  footer{color:var(--dim);font-size:12px;line-height:1.9;margin-top:6px}
+  footer b{color:var(--muted);font-weight:500}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:99;
+    background:#182130;border:1px solid #2e3c56;color:var(--text);border-radius:10px;
+    padding:10px 18px;font-size:13px;box-shadow:0 12px 40px #000b;max-width:80vw}
+  .toast.ok{border-color:#3ecf8e66}
+  .toast.err{border-color:#ff5f6d66}
+  .ok-t{color:var(--ok)} .bad-t{color:var(--danger)} .warn-t{color:var(--warn)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="logo">鸣</div>
+      <div>
+        <h1>鸣潮mod下载链接整合器</h1>
+        <div class="sub">数据源：GameBanana 公开 API + Nexus Mods 公开接口</div>
+      </div>
+    </div>
+    <div class="stats" id="statChips"></div>
+  </header>
+
+  <div class="tabbar">
+    <button class="tab active" data-src="gb">GameBanana<span class="cnt" id="cntGb"></span></button>
+    <button class="tab" data-src="nexus">Nexus Mods<span class="cnt" id="cntNx"></span></button>
+    <span class="spacer"></span>
+    <button id="btnSettings" class="btn">设置</button>
+    <button id="btnQuit" class="btn ghost" title="停止后台服务并退出应用">退出</button>
+  </div>
+
+  <section class="card taskcard hidden" id="taskCard">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <b id="taskLabel" style="font-size:13px">任务</b>
+      <span class="spacer"></span>
+      <button id="btnStop" class="btn danger hidden">停止任务</button>
+    </div>
+    <div id="progress" class="progress">
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="ptext" id="progressText"></div>
+    </div>
+  </section>
+
+  <div id="wrapGb">
+  <section class="card toolbar">
+    <div class="row1">
+      <button id="btnSync" class="btn primary">① 同步 Mod 列表</button>
+
+      <div class="dd">
+        <button class="btn accent" data-dd>② 抓取下载链接 ▾</button>
+        <div class="dd-panel">
+          <div class="dd-title">抓取范围</div>
+          <label><input type="radio" name="fmode" value="filter" checked> 当前筛选结果的未抓取项</label>
+          <label><input type="radio" name="fmode" value="all"> 全部未抓取的 Mod</label>
+          <label><input type="radio" name="fmode" value="ids"> 已勾选的 Mod（<span id="fmSelCount">0</span> 个）</label>
+          <div style="margin-top:8px">
+            最多抓取 <input id="fmLimit" class="inp-num" type="number" value="200" min="1">
+            <label class="chk"><input type="checkbox" id="fmNoLimit"> 不限量</label>
+          </div>
+          <label><input type="checkbox" id="fmForce"> 重新抓取（覆盖已有链接）</label>
+          <div class="dd-note" id="fmEst">预计：—</div>
+          <button id="fmStart" class="btn accent w100">开始抓取</button>
+        </div>
+      </div>
+
+      <div class="dd">
+        <button class="btn blue" data-dd>③ 导出 ▾</button>
+        <div class="dd-panel">
+          <div class="dd-title">导出范围 / 格式（文件同时保存到 exports 目录）</div>
+          <button class="menu-item" data-exp="all|csv">全部数据 · CSV（含下载链接，Excel 可直接打开）</button>
+          <button class="menu-item" data-exp="all|json">全部数据 · JSON</button>
+          <button class="menu-item" data-exp="all|txt">全部数据 · TXT（纯链接，可导入下载器）</button>
+          <hr>
+          <button class="menu-item" data-exp="filter|csv">当前筛选结果 · CSV</button>
+          <button class="menu-item" data-exp="filter|txt">当前筛选结果 · TXT</button>
+          <hr>
+          <button class="menu-item" data-exp="ids|csv">已勾选 · CSV</button>
+          <button class="menu-item" data-exp="ids|txt">已勾选 · TXT</button>
+        </div>
+      </div>
+
+      <button id="btnDlMgr" class="btn gold">④ 下载管理</button>
+
+    </div>
+  </section>
+
+  <div id="updBar" class="hidden" style="margin:8px 0;padding:8px 12px;border:1px solid #4a90e2;border-radius:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:rgba(74,144,226,.1)">
+    <span id="updText" class="dim" style="flex:1;min-width:200px"></span>
+    <button class="btn xs accent" id="updBtn">下载更新</button>
+    <button class="btn xs ghost" id="updClose">忽略</button>
+  </div>
+
+  <input type="file" id="dirPicker" webkitdirectory multiple class="hidden">
+
+  <section class="card filters">
+    <input id="inpQ" type="text" placeholder="搜索：名称 / 作者 / 角色（回车查询）">
+    <select id="selChar"><option value="all">全部角色</option></select>
+    <select id="selSort">
+      <option value="updated_desc">按最近更新</option>
+      <option value="added_desc">按发布时间</option>
+      <option value="likes_desc">按点赞数</option>
+      <option value="views_desc">按浏览量</option>
+      <option value="downloads_desc">按下载量（仅已抓取的）</option>
+      <option value="name_asc">按名称</option>
+    </select>
+    <select id="selRated">
+      <option value="all">内容分级：全部</option>
+      <option value="1">仅敏感分级</option>
+      <option value="0">仅普通</option>
+    </select>
+    <select id="selFetched">
+      <option value="all">链接状态：全部</option>
+      <option value="1">已抓取链接</option>
+      <option value="0">未抓取链接</option>
+    </select>
+    <select id="selPerpage">
+      <option value="30">30 条/页</option>
+      <option value="50" selected>50 条/页</option>
+      <option value="100">100 条/页</option>
+    </select>
+  </section>
+
+  <section class="card list">
+    <div class="selbar">
+      <span id="selInfo" class="dim">未选择</span>
+      <button id="btnSelPage" class="btn xs ghost">全选本页</button>
+      <button id="btnSelClear" class="btn xs ghost">清空选择</button>
+      <span class="spacer"></span>
+      <button id="btnFetchSel" class="btn xs accent" disabled>抓取所选链接</button>
+      <button id="btnCopySel" class="btn xs ghost" disabled>复制所选链接</button>
+      <button id="btnExportSel" class="btn xs ghost" disabled>导出所选 CSV</button>
+    </div>
+    <div class="tablewrap">
+      <table class="mt">
+        <thead>
+          <tr>
+            <th style="width:36px"></th>
+            <th style="width:116px">预览</th>
+            <th>Mod</th>
+            <th style="width:72px">角色</th>
+            <th style="width:124px">链接状态</th>
+            <th style="width:62px;text-align:right">点赞</th>
+            <th style="width:68px;text-align:right">浏览</th>
+            <th style="width:74px;text-align:right">下载量</th>
+            <th style="width:86px">最近更新</th>
+            <th style="width:106px;text-align:right">操作</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div id="empty" class="empty hidden"></div>
+    </div>
+    <div class="pager">
+      <button id="pgFirst">« 首页</button>
+      <button id="pgPrev">上一页</button>
+      <span id="pgInfo" class="dim">—</span>
+      <button id="pgNext">下一页</button>
+      <button id="pgLast">末页 »</button>
+      <input id="pgJump" type="number" min="1" placeholder="页码">
+      <button id="pgGo">跳转</button>
+    </div>
+  </section>
+  </div><!-- /wrapGb -->
+
+  <div id="wrapNexus" class="hidden">
+
+    <section class="card">
+      <b style="font-size:13.5px">Nexus Mods 接入</b>
+      <span class="dim">　列表与文件信息走 Nexus 公开 GraphQL 接口（无需 Key）；API Key、nxm 协议等配置已移至右上角「设置」</span>
+      <div class="statusline" id="nxStatus">—</div>
+      <div id="nxInboxWrap" class="hidden" style="margin-top:10px">
+        <div class="dim">nxm 下载收件箱（在 Nexus 网页点「Mod manager download」后，直链会自动出现在这里并复制到剪贴板；可直接粘贴进 IDM 等下载器，或让 IDM 从剪贴板自动添加）</div>
+        <div id="nxInboxList" style="margin-top:6px"></div>
+      </div>
+    </section>
+
+    <section class="card toolbar">
+      <div class="row1">
+        <button id="nxSync" class="btn primary">① 同步 Nexus 列表</button>
+        <div class="dd">
+          <button class="btn accent" data-dd>② 抓取文件信息 ▾</button>
+          <div class="dd-panel">
+            <div class="dd-title">抓取范围（文件清单 + 手动下载页链接）</div>
+            <label><input type="radio" name="nxmode" value="all" checked> 全部未抓取的 Mod</label>
+            <label><input type="radio" name="nxmode" value="filter"> 当前筛选结果的未抓取项</label>
+            <label><input type="radio" name="nxmode" value="ids"> 已勾选的 Mod（<span id="nxSelCount">0</span> 个）</label>
+            <label><input type="checkbox" id="nxForce"> 重新抓取（覆盖已有）</label>
+            <div class="dd-note" id="nxEst">预计：—</div>
+            <button id="nxStart" class="btn accent w100">开始抓取</button>
+          </div>
+        </div>
+        <div class="dd">
+          <button class="btn" data-dd>③ 导出 ▾</button>
+          <div class="dd-panel">
+            <div class="dd-title">导出范围 / 格式（文件同时保存到 exports 目录）</div>
+            <button class="menu-item" data-nexp="all|csv">全部数据 · CSV（含文件页链接）</button>
+            <button class="menu-item" data-nexp="all|json">全部数据 · JSON</button>
+            <button class="menu-item" data-nexp="all|txt">全部数据 · TXT（文件页链接）</button>
+            <hr>
+            <button class="menu-item" data-nexp="filter|csv">当前筛选结果 · CSV</button>
+            <button class="menu-item" data-nexp="filter|txt">当前筛选结果 · TXT</button>
+            <hr>
+            <button class="menu-item" data-nexp="ids|csv">已勾选 · CSV</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card filters">
+      <input id="nxQ" type="text" placeholder="搜索：名称 / 作者 / 简介">
+      <select id="nxSort">
+        <option value="updated_desc">按最近更新</option>
+        <option value="created_desc">按发布时间</option>
+        <option value="downloads_desc">按下载量</option>
+        <option value="endorsements_desc">按认可数</option>
+        <option value="name_asc">按名称</option>
+      </select>
+      <select id="nxFiles">
+        <option value="all">文件状态：全部</option>
+        <option value="1">已抓取文件信息</option>
+        <option value="0">未抓取文件信息</option>
+      </select>
+      <select id="nxAdult">
+        <option value="all">内容：全部</option>
+        <option value="1">仅成人内容</option>
+        <option value="0">仅普通内容</option>
+      </select>
+      <select id="nxPerpage">
+        <option value="30">30 条/页</option>
+        <option value="50" selected>50 条/页</option>
+        <option value="100">100 条/页</option>
+      </select>
+    </section>
+
+    <section class="card list">
+      <div class="selbar">
+        <span id="nxSelInfo" class="dim">未选择</span>
+        <button id="nxSelPage" class="btn xs ghost">全选本页</button>
+        <button id="nxSelClear" class="btn xs ghost">清空选择</button>
+        <span class="spacer"></span>
+        <button id="nxFetchSel" class="btn xs accent" disabled>抓取所选文件信息</button>
+        <button id="nxCopySel" class="btn xs ghost" disabled>复制所选文件页链接</button>
+        <button id="nxExportSel" class="btn xs ghost" disabled>导出所选 CSV</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:28px"></th>
+              <th style="width:74px">预览</th>
+              <th>Mod</th>
+              <th>文件状态</th>
+              <th style="text-align:right">下载量</th>
+              <th style="text-align:right">认可</th>
+              <th>最近更新</th>
+              <th style="width:150px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="nxTbody"></tbody>
+        </table>
+        <div id="nxEmpty" class="empty hidden"></div>
+      </div>
+      <div class="pager">
+        <button id="nxPgFirst">« 首页</button>
+        <button id="nxPgPrev">上一页</button>
+        <span id="nxPgInfo" class="dim">—</span>
+        <button id="nxPgNext">下一页</button>
+        <button id="nxPgLast">末页 »</button>
+        <input id="nxPgJump" type="number" min="1" placeholder="页码">
+        <button id="nxPgGo">跳转</button>
+      </div>
+    </section>
+  </div><!-- /wrapNexus -->
+
+  <footer>
+    <b>GameBanana 用法：</b>点「① 同步 Mod 列表」拉取全部目录（约 3050 条）→「② 抓取下载链接」批量提取直链 →「③ 导出」。
+    抓取可随时停止、断点续抓。<br>
+    <b>Nexus 用法：</b>点「① 同步 Nexus 列表」（94 个 Mod，约 10 秒）→「② 抓取文件信息」获取文件清单；
+    每个文件可用「文件页」手动下载；如需接口直链，请填写 API Key（且账号为 Premium）。<br>
+    <b>免责声明：</b>本工具仅通过 GameBanana 官方公开 API 与 Nexus Mods 公开接口读取元数据与链接；
+    第三方 Mod 的安装与使用请自行评估风险，并遵守《鸣潮》用户协议与各平台规则。
+  </footer>
+</div>
+
+<div class="modal hidden" id="dlModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <b>下载管理</b>
+      <button class="btn xs ghost" id="dlClose">关闭</button>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin:8px 0;flex-wrap:wrap">
+      <button class="btn xs ghost" id="dlOpenDir">打开下载文件夹</button>
+      <button class="btn xs ghost" id="dlClear">清空已完成记录</button>
+      <span class="dim">文件保存到设置里的「下载目录」（默认为应用目录下 downloads）</span>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;margin:8px 0">
+      <input id="dlUrl" placeholder="粘贴任意下载链接（http/https，任意网站的文件）" style="flex:1">
+      <button class="btn xs" id="dlAdd">下载</button>
+    </div>
+    <div id="dlList" class="dim">暂无下载任务——在 Mod 详情的文件列表里点「下载」，或在上方粘贴任意链接。</div>
+  </div>
+</div>
+
+<div id="updateBar" class="updatebar hidden">
+  应用已更新（页面里还是旧版本代码）
+  <button class="btn xs accent" id="updateReload">点击刷新</button>
+</div>
+
+<div class="modal hidden" id="imgModal">
+  <button class="btn xs ghost" id="imgModalClose" style="position:absolute;top:18px;right:22px">关闭 ✕</button>
+  <div class="imgbox">
+    <img id="imgModalImg" alt="">
+    <div class="imgcap" id="imgModalCap"></div>
+  </div>
+</div>
+
+<div class="modal hidden" id="settingsModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <b>设置</b>
+      <button class="btn xs ghost" id="settingsClose">关闭</button>
+    </div>
+
+    <div class="sec-title">NEXUS API KEY</div>
+    <div class="keybox">
+      <input id="nxKey" type="password" placeholder="粘贴 Nexus API Key（可留空，仅影响下载直链）">
+      <button id="nxKeySave" class="btn accent">验证并保存</button>
+      <button id="nxKeyClear" class="btn ghost">清除</button>
+    </div>
+    <div class="statusline" id="stKeyStatus">—</div>
+    <div style="margin-top:8px">
+      <a class="btn ghost" href="https://www.nexusmods.com/users/myaccount?tab=api" data-openurl="https://www.nexusmods.com/users/myaccount?tab=api" target="_blank" rel="noreferrer">获取 Key 的页面</a>
+    </div>
+
+    <div id="nxmSec" class="hidden">
+      <div class="sec-title">NXM 协议（网页一键取直链）</div>
+      <div class="statusline" id="stNxmStatus">—</div>
+    </div>
+
+    <div class="sec-title">请求与显示</div>
+    <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:4px">
+      <div class="dim">请求间隔
+        <select id="selInterval" style="background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:7px;padding:5px 8px">
+          <option value="0.5">0.5 秒（快，有被限流风险）</option>
+          <option value="1.0" selected>1.0 秒（推荐）</option>
+          <option value="1.5">1.5 秒</option>
+          <option value="2.0">2.0 秒（保守）</option>
+          <option value="3.0">3.0 秒</option>
+        </select>
+      </div>
+      <label class="dim" style="display:flex;align-items:center;gap:6px;cursor:pointer" title="开启后，敏感分级 Mod 的预览图将默认模糊，点击单张可临时看清">
+        <input type="checkbox" id="chkBlur" style="accent-color:var(--accent)"> 模糊敏感预览图
+      </label>
+      <label class="dim" style="display:flex;align-items:center;gap:6px;cursor:pointer" title="每天第一次打开应用时，自动触发一次「同步 Mod 列表」">
+        <input type="checkbox" id="chkAutoSync" style="accent-color:var(--accent)"> 每日自动同步
+      </label>
+    </div>
+    <div style="margin-top:10px" class="dim">抓取并发线程数（0=自动探测最优，1-10=手动固定）
+      <div class="keybox" style="margin-top:6px">
+        <input id="setThreads" type="number" min="0" max="10" value="0" style="width:80px">
+        <button id="setThreadsSave" class="btn">保存</button>
+      </div>
+      <div class="dim" id="setThreadsHint" style="font-size:11px;margin-top:4px"></div>
+    </div>
+
+    <div style="margin-top:14px" class="dim">Mod 文件夹补预览图（JASM / XXMI·WWMI 里没有预览图时用；须填管理器实际管理的目录）
+      <div class="keybox" style="margin-top:6px">
+        <input id="setPrevFolder" placeholder="Mod 根文件夹路径（点「浏览」选择，或自动填 JASM 检测到的目录）" style="flex:1">
+        <button id="btnBrowsePrev" class="btn ghost">浏览…</button>
+        <button id="btnFixPrev" class="btn">开始补预览</button>
+      </div>
+      <div class="dim" id="fixPrevHint" style="font-size:11px;margin-top:4px"></div>
+      <div class="dim" style="font-size:11px;margin-top:4px">自动按文件夹名匹配 GameBanana 目录并下载预览图存为 preview.jpg（每次最多处理 60 个，可重复点击）</div>
+    </div>
+
+    <div style="margin-top:14px" class="dim">应用更新（Gitee 版本清单地址，留空 = 不检查更新）
+      <div class="keybox" style="margin-top:6px">
+        <input id="setUpdateUrl" placeholder="https://gitee.com/用户名/仓库名/raw/master/version.json" style="flex:1">
+        <button id="setUpdateSave" class="btn">保存</button>
+        <button id="btnCheckUpd" class="btn ghost">立即检查</button>
+      </div>
+      <div class="dim" id="updHint" style="font-size:11px;margin-top:4px"></div>
+    </div>
+    <div style="margin-top:10px" class="dim">下载目录（GameBanana 文件保存位置，留空 = 应用目录下 downloads）
+      <div class="keybox" style="margin-top:6px">
+        <input id="setDlDir" type="text" placeholder="例如 D:\\MCMOD\\downloads" style="flex:1">
+        <button id="btnBrowseDlDir" class="btn ghost">浏览…</button>
+        <button id="setDlDirSave" class="btn">保存</button>
+      </div>
+    </div>
+
+    <div class="sec-title">线路测速</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn xs accent" id="btnSpeed">开始测速</button>
+      <span class="dim">对国际基线 / GameBanana / Nexus 各采样一次（约 10~45 秒，线路差时更久），换节点后可对比</span>
+    </div>
+    <div id="speedResult" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const fmtN = (n) => (n == null ? "—" : Number(n).toLocaleString("zh-Hans-CN"));
+const fmtDate = (ts) => ts ? new Date(ts * 1000).toLocaleDateString("zh-Hans-CN") : "—";
+const fmtSize = (b) => {
+  if (b == null) return "—";
+  if (b < 1024) return b + " B";
+  if (b < 1048576) return Math.round(b / 1024) + " KB";
+  if (b >= 1073741824) return (b / 1073741824).toFixed(2) + " GB";
+  return (b / 1048576).toFixed(1) + " MB";
+};
+const fmtDur = (s) => { if (s == null) return "—"; if (s < 60) return Math.ceil(s) + " 秒";
+  const m = Math.floor(s / 60), r = Math.round(s % 60); return m + " 分" + (r ? " " + r + " 秒" : ""); };
+
+const S = {
+  q: "", char: "all", sort: "updated_desc", rated: "all", fetched: "all",
+  page: 1, perpage: 50, total: 0, items: [],
+  selected: new Set(), expanded: new Set(), detailCache: new Map(),
+  stats: null, running: false, timer: null,
+};
+
+let SRC = "gb";    // 当前数据源：gb | nexus
+let BLUR = false;  // 是否模糊敏感预览图（默认关：全部显示清晰预览）
+
+function renderChips() {
+  const box = $("#statChips");
+  if (SRC === "gb") {
+    const st = S.stats;
+    if (!st) { box.innerHTML = ""; return; }
+    box.innerHTML = [
+      ["Mod 总数", fmtN(st.total_mods)],
+      ["已抓链接", fmtN(st.fetched_mods)],
+      ["链接文件", fmtN(st.total_files)],
+      ["敏感分级", fmtN(st.rated_mods)],
+      ["上次同步", st.last_sync_ts ? fmtDate(st.last_sync_ts) : "—"],
+    ].map(([k, v]) => `<span class="chip">${k}<b>${v}</b></span>`).join("");
+  } else {
+    const st = (NX.settings && NX.settings.stats) || null;
+    if (!st) { box.innerHTML = ""; return; }
+    box.innerHTML = [
+      ["Nexus Mod", fmtN(st.total_mods)],
+      ["已抓文件信息", fmtN(st.files_fetched)],
+      ["文件数", fmtN(st.total_files)],
+      ["成人内容", fmtN(st.adult_mods)],
+      ["上次同步", st.last_sync_ts ? fmtDate(st.last_sync_ts) : "—"],
+    ].map(([k, v]) => `<span class="chip">${k}<b>${v}</b></span>`).join("");
+  }
+}
+
+function toast(msg, cls) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.className = "toast " + (cls || "");
+  clearTimeout(t._h);
+  t._h = setTimeout(() => t.classList.add("hidden"), 4200);
+}
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  let data = null;
+  try { data = await r.json(); } catch (e) { /* 非 JSON */ }
+  if (!r.ok) throw new Error((data && data.error) || ("HTTP " + r.status));
+  return data;
+}
+const post = (path, body) => api(path, {
+  method: "POST", headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(body || {})
+});
+
+/* 交给系统默认浏览器打开（保证用你已登录 Nexus 的浏览器；8 秒内同链接去重防连点） */
+const _recentOpen = {};
+function openExt(url) {
+  if (!url) return;
+  const now = Date.now();
+  if (_recentOpen[url] && now - _recentOpen[url] < 8000) return;
+  _recentOpen[url] = now;
+  fetch("/api/open?url=" + encodeURIComponent(url))
+    .then(r => r.json())
+    .then(d => { if (d && d.error) toast(d.error, "err"); })
+    .catch(() => window.open(url, "_blank"));
+}
+
+/* ---------------- 应用内简介与中英翻译 ---------------- */
+const DESC_OPEN = new Set();                 // 会话内记录"简介展开"状态（src:id），避免污染数据缓存
+function upgradeThumb(el) {
+  // 预览图渐进升级链：100 档先显示（本地 16ms）→ 530 → 原图，逐级后台替换，不阻塞布局
+  const chain = [el.dataset.hd, el.dataset.hd2].filter(Boolean);
+  if (!chain.length || el.dataset.upgraded) return;
+  el.dataset.upgraded = "1";
+  (function step(i) {
+    if (i >= chain.length) return;
+    const h = new Image();
+    h.onload = () => { el.src = chain[i]; step(i + 1); };
+    h.onerror = () => {};
+    h.src = chain[i];
+  })(0);
+}
+
+function descBlockHtml(src, id, d) {
+  const text = (d.descFull || d.summary || "").trim();
+  const open = DESC_OPEN.has(src + ":" + id);
+  // 简介预览图：本地缩略图代理 + 两级渐进（100 占位 → 530 终档）。
+  // v=2：E39 期间浏览器缓存了"?s=530=100 小图"的污染条目（immutable 7 天），
+  // 改 URL 强制绕过；530 档已全量预热（本地 16-30ms 秒开）
+  const prevSrc = src === "gb" ? `/api/thumb/${id}?s=100&v=2` : (d.picture || "");
+  const prevBig = src === "gb" ? bigThumbUrl(d.thumb || "") : (d.picture || "");
+  const prevMid = src === "gb" ? `/api/thumb/${id}?s=530&v=2` : "";
+  const prevHd = src === "gb" ? `/api/thumb/${id}?s=530&v=2` : "";
+  const prevHtml = prevSrc ? `
+        <div class="descprev">
+          <img loading="lazy" decoding="async" src="${esc(prevSrc)}" data-hd="${esc(prevHd)}"
+            onload="upgradeThumb(this)"
+            data-big="${esc(prevBig)}" data-mid="${esc(prevMid)}" data-cap="${esc(d.name)}"
+            title="点击放大查看" alt="">
+        </div>` : "";
+  return `
+    <div class="descbox">
+      <div class="deschead" data-desctoggle="${src}:${id}">
+        <b>简介</b>
+        <span class="dim">（${text ? "含预览图、英文原文与中文翻译" : "点开后可看预览图、加载完整简介并翻译"}）</span>
+        <span class="spacer"></span>
+        <span class="btn xs ghost">${open ? "收起 ▴" : "展开 ▾"}</span>
+      </div>
+      <div class="${open ? "" : "hidden"}" id="descbody-${src}-${id}" style="margin-top:8px">
+        ${prevHtml}
+      <div class="desctext" id="desc-${src}-${id}">${text ? esc(text) : (d.descLoading ? "（简介加载中…）" : "（该 Mod 没有提供文字简介）")}</div>
+      <div style="margin:8px 0 2px">
+        <button class="btn xs accent" data-transdesc="${src}:${id}">翻译成中文</button>
+      </div>
+        <div class="desctext zh ${d.transText ? "" : "hidden"}" id="trans-${src}-${id}">${esc(d.transText || "")}</div>
+      </div>
+    </div>`;
+}
+
+async function loadDesc(src, id) {
+  const cache = src === "nx" ? NX.cache : S.detailCache;
+  const d0 = cache.get(id) || {};
+  if (d0.descLoading) return;                // 防重复并发
+  d0.descLoading = true;
+  cache.set(id, d0);
+  try {
+    let r;
+    if (src === "nx") r = await api(`/api/nexus/mods/${id}/description`);
+    else r = await api(`/api/gb/mods/${id}/detail`);
+    const d = cache.get(id) || {};
+    d.descFull = ((src === "nx" ? (r.description || r.summary) : r.description) || "").trim();
+    d.descLoaded = true;
+    d.descLoading = false;
+    const hadFiles = (d.files || []).length > 0;
+    if (src === "gb" && r.files && r.files.length) { d.files = r.files; d.file_count = r.files.length; }
+    if (src === "gb") d.mirrors = r.mirrors || [];
+    // 详情实时数据已由服务端校准入库：同步列表徽章，避免「已抓取 2 个文件」对上 3 行
+    const row = S.items.find(x => x.id === id);
+    if (src === "gb" && row && (r.files || []).length) {
+      const n = r.files.length;
+      if (!row.links_fetched) row.links_fetched = 1;
+      if (row.file_count !== n) {
+        row.file_count = n;
+        const cell = document.getElementById(`st-${id}`);
+        if (cell) cell.innerHTML = statusHtml(row);      // 就地换徽章，不整表重绘
+        loadStats().catch(() => {});                      // 顶部「链接文件」同步 +n
+      }
+    }
+    // 服务端已把实时结果校准入库 → 用新数据重渲染文件表（否则本次展开仍是旧行数）
+    if (src === "gb" && r.reconciled) {
+      d.files = r.files || [];
+      d.file_count = d.files.length;
+      d.descLoaded = true;              // 防止 loadDetail 再次触发 loadDesc
+      cache.set(id, d);
+      loadDetail(id);
+      return;
+    }
+    cache.set(id, d);
+    // 就地更新（避免整块重渲染跳动）
+    const box = document.getElementById(`desc-${src}-${id}`);
+    if (box) {
+      box.textContent = d.descFull || "（该 Mod 没有提供文字简介）";
+      if (src === "gb" && (d.mirrors || []).length && !document.getElementById(`mirrors-${src}-${id}`)) {
+        const mrow = document.createElement("div");
+        mrow.id = `mirrors-${src}-${id}`;
+        mrow.className = "mirrorbox";
+        mrow.innerHTML = `<div class="dim" style="margin:6px 0 3px;font-size:11px">备用链接（作者提供，打开后按页面提示下载）：</div>` +
+          d.mirrors.map(mm => `<div class="mirrorrow">
+            <span class="mtag">${esc(mm.label)}</span>
+            <span class="dim" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(mm.url)}</span>
+            <a class="btn xs" href="${esc(mm.url)}" target="_blank" rel="noreferrer" data-openurl="${esc(mm.url)}">打开</a>
+            <button class="btn xs ghost" data-copy="${esc(mm.url)}">复制</button>
+          </div>`).join("");
+        box.insertAdjacentElement("afterend", mrow);
+      }
+    } else if (src === "gb" && !hadFiles && (d.files || []).length) {
+      loadDetail(id);                        // 首次拿到文件列表时重渲染（descLoaded 已置位，不会循环）
+    }
+  } catch (e) {
+    const d = cache.get(id) || {};
+    d.descLoading = false;
+    cache.set(id, d);
+    const box = document.getElementById(`desc-${src}-${id}`);
+    if (box) box.textContent = "（简介加载失败：" + e.message + "）";
+    else toast("简介自动加载失败，可稍后重试", "err");
+  }
+}
+
+async function transDesc(src, id, btn) {
+  const cache = src === "nx" ? NX.cache : S.detailCache;
+  const d = cache.get(id) || {};
+  const source = (d.descFull || d.summary || "").trim();
+  if (!source) { toast(src === "gb" ? "请先点「加载完整简介」" : "该 Mod 没有文字简介", "err"); return; }
+  btn.disabled = true;
+  btn.textContent = "翻译中…";
+  try {
+    const r = await post("/api/translate", { text: source });
+    const box = document.getElementById(`trans-${src}-${id}`);
+    if (box) { box.textContent = r.text; box.classList.remove("hidden"); }
+    d.transText = r.text;
+    cache.set(id, d);
+    toast(`翻译完成（${r.cached ? "缓存" : r.provider}${r.truncated ? "；长文仅翻译前 3500 字" : ""}）`, "ok");
+  } catch (e) {
+    toast("翻译失败：" + e.message, "err");
+  }
+  btn.disabled = false;
+  btn.textContent = "翻译成中文";
+}
+
+/* ---------------- 统计与筛选选项 ---------------- */
+async function loadStats() {
+  S.stats = await api("/api/stats");
+  const st = S.stats;
+  BLUR = !!st.blur_sensitive;
+  $("#chkBlur").checked = BLUR;
+  // 每日自动同步可见性：刚完成（3 分钟内）→ 提示一次；正在跑 → 由常驻轮询显示进度条
+  if (!S.syncToastShown && st.auto_sync_daily && st.last_sync_ts &&
+      Date.now() / 1000 - st.last_sync_ts < 180 && st.task?.kind !== "sync") {
+    S.syncToastShown = true;
+    toast(`每日自动同步已完成（当前目录 ${st.total_mods} 个 Mod）`, "ok");
+  }
+  const asw = $("#chkAutoSync");
+  if (asw) asw.checked = st.auto_sync_daily !== false;
+  const ftw = $("#setThreads");
+  if (ftw) ftw.value = (st.fetch_threads === 0 || st.fetch_threads) ? st.fetch_threads : 0;
+  const uu = $("#setUpdateUrl");
+  if (uu && !uu.value) uu.value = st.update_url || "";
+  const pf = $("#setPrevFolder");
+  if (pf) pf.value = st.prev_folder || pf.value || "";
+  const fth = $("#setThreadsHint");
+  if (fth) {
+    const m = ((st.task && st.task.message) || "").match(/(\d+) 线程/);
+    if ((st.fetch_threads ?? 0) === 0)
+      fth.textContent = m ? `自动模式：最近一次任务实际使用 ${m[1]} 线程（按线路自动增减）`
+                          : "自动模式：任务开始后自动探测最优线程数";
+    else
+      fth.textContent = `手动固定 ${st.fetch_threads} 线程（填 0 可切换回自动）`;
+  }
+  $("#cntGb").textContent = st.total_mods ? `（${fmtN(st.total_mods)}）` : "";
+  if (SRC === "gb") renderChips();
+
+  const sel = $("#selChar"), cur = sel.value;
+  sel.innerHTML = `<option value="all">全部角色（${st.categories.length}）</option>` +
+    st.categories.map(c => `<option value="${esc(c.name)}">${esc(c.name)}（${c.count}）</option>`).join("");
+  sel.value = cur || "all";
+
+  if (st.min_interval) {
+    const sel = $("#selInterval");
+    if (sel) {
+      const iv = Number(st.min_interval).toFixed(1);   // 归一化为 "1.0" 格式，匹配选项值
+      if (sel.querySelector(`option[value="${iv}"]`)) sel.value = iv;
+    }
+  }
+  updateFetchEst();
+  return st;
+}
+
+/* ---------------- 列表 ---------------- */
+function params(extra) {
+  const p = new URLSearchParams({
+    q: S.q, char: S.char, sort: S.sort, rated: S.rated, fetched: S.fetched,
+    page: S.page, perpage: S.perpage,
+  });
+  if (extra) for (const k in extra) p.set(k, extra[k]);
+  return p;
+}
+
+async function loadMods() {
+  const d = await api("/api/mods?" + params().toString());
+  S.total = d.total; S.items = d.items;
+  renderTable();
+  renderPager();
+}
+
+/* GameBanana 缩略图 URL（530-90_xxx.jpg）→ 原图（xxx.jpg） */
+function bigThumbUrl(url) {
+  return String(url || "").replace(/\/(\d+)-90_/, "/");
+}
+
+/* 派生轻量尺寸：兼容“530-90_xxx.jpg”（有 530 档）与“xxx.jpg”（原件：100/220 档仍存在，实测已验证） */
+function thumbSizes(url) {
+  const m = String(url || "").match(/^(.*\/)(?:(\d+)-90_)?([^/]+)$/);
+  if (!m) return null;
+  const dir = m[1], fname = m[3];
+  return { small: dir + "100-90_" + fname, mid: dir + "220-90_" + fname, big: dir + fname };
+}
+
+function thumbHtml(m) {
+  const rated = !!m.rated;
+  if (!m.thumb) return `<div class="ph">${rated ? "18+" : "无图"}</div>`;
+  // 走本地缩略图代理：命中 <10ms；未命中 302 到图床，同时后台预热
+  return `<img loading="lazy" decoding="async" src="/api/thumb/${m.id}"
+    class="${rated && BLUR ? "blurred" : ""}"
+    data-thumb="${m.id}" data-mid="${esc(m.thumb)}" data-big="${esc(bigThumbUrl(m.thumb))}"
+    data-cap="${esc(m.name)}" title="点击放大查看" alt="">`;
+}
+
+function statusHtml(m) {
+  if (m.last_error && !m.links_fetched) return `<span class="badge bad">失败</span> <span class="dim">${esc((m.last_error || "").slice(0, 40))}</span>`;
+  if (m.links_fetched) {
+    const n = m.file_count || 0;
+    return n > 0 ? `<span class="badge ok">已抓取 ${n} 个文件</span>` : `<span class="badge warn">无文件</span>`;
+  }
+  return `<span class="badge">未抓取</span>`;
+}
+
+function renderTable() {
+  const tb = $("#tbody");
+  if (!S.items.length) {
+    tb.innerHTML = "";
+    const e = $("#empty");
+    e.classList.remove("hidden");
+    e.innerHTML = (S.stats && S.stats.total_mods === 0)
+      ? `<div class="big">本地还没有数据</div>点击上方「① 同步 Mod 列表」开始（约 3050 条，1–2 分钟）`
+      : `<div class="big">没有符合条件的 Mod</div>试试调整筛选条件`;
+    return;
+  }
+  $("#empty").classList.add("hidden");
+  tb.innerHTML = S.items.map(m => {
+    const checked = S.selected.has(m.id) ? "checked" : "";
+    const isExp = S.expanded.has(m.id);
+    const row = `<tr data-id="${m.id}">
+      <td><input type="checkbox" data-cb="${m.id}" ${checked}></td>
+      <td class="thumb">${thumbHtml(m)}</td>
+      <td>
+        <div class="namerow">
+          <a href="${esc(m.url)}" data-openurl="${esc(m.url)}" target="_blank" rel="noreferrer" title="${esc(m.name)}">${esc(m.name)}</a>
+          ${m.version ? `<span class="badge">${esc(m.version)}</span>` : ""}
+          ${m.rated ? `<span class="badge warn">18+</span>` : ""}
+        </div>
+        <div class="dim">by ${esc(m.author || "?")}</div>
+      </td>
+      <td>${esc(m.sub_cat || "—")}</td>
+      <td id="st-${m.id}">${statusHtml(m)}</td>
+      <td class="num">${fmtN(m.likes)}</td>
+      <td class="num">${fmtN(m.views)}</td>
+      <td class="num">${m.downloads == null ? "—" : fmtN(m.downloads)}</td>
+      <td class="dim">${fmtDate(m.updated_ts)}</td>
+      <td style="text-align:right">
+        ${m.links_fetched ? "" : `<button class="btn xs accent" data-fetch="${m.id}">抓取</button>`}
+        <button class="btn xs ghost" data-exp="${m.id}">${isExp ? "收起" : "详情"}</button>
+      </td>
+    </tr>`;
+    const exp = isExp ? `<tr class="exp"><td colspan="10"><div class="files" id="files-${m.id}">
+      加载中…</div></td></tr>` : "";
+    return row + exp;
+  }).join("");
+  S.expanded.forEach(id => loadDetail(id));
+  updateSelBar();
+}
+
+function renderPager() {
+  const pages = Math.max(1, Math.ceil(S.total / S.perpage));
+  $("#pgInfo").textContent = `第 ${S.page} / ${pages} 页 · 共 ${fmtN(S.total)} 条`;
+  $("#pgPrev").disabled = $("#pgFirst").disabled = S.page <= 1;
+  $("#pgNext").disabled = $("#pgLast").disabled = S.page >= pages;
+}
+
+/* ---------------- 详情展开 ---------------- */
+// 链接发布时间：published_at = ISO8601 UTC；缺失明确显示「未知」，回退到 Mod 时间的标「估」
+function fmtPub(f) {
+  const at = (f && f.published_at) || "";
+  if (!at) return `<span class="dim">未知</span>`;
+  const tag = (f.published_state === "estimated") ? ` <span class="dim">(估)</span>` : "";
+  return `<span title="${esc(at)}">${esc(at.slice(0, 10))}</span>${tag}`;
+}
+
+async function loadDetail(id) {
+  const box = document.getElementById("files-" + id);
+  if (!box) return;
+  try {
+    let d = S.detailCache.get(id);
+    if (!d) { d = await api("/api/mods/" + id); S.detailCache.set(id, d); }
+    // 库内已缓存的简介正文直接同步填充：展开即显示，不等跨境实时接口
+    if (d.desc_full) { d.descFull = d.desc_full; d.descLoaded = true; }
+    const files = d.files || [];
+    // GB 走轻量 /Files 接口时 desc 为空：整列为空就不渲染，把宽度让给文件名
+    const hasDesc = files.some(f => (f.desc || "").trim());
+    if (!d.descLoaded && !d.descLoading) loadDesc("gb", id);   // 展开详情自动获取简介
+    const ratings = (d.ratings || []).join(" / ");
+    box.innerHTML = descBlockHtml("gb", id, d) + `
+      <h4>${files.length} 个文件
+        ${d.downloads != null ? `· Mod 总下载 ${fmtN(d.downloads)}` : ""}
+        ${ratings ? `· 分级：${esc(ratings)}` : ""}
+        · <a href="${esc(d.url)}" target="_blank" rel="noreferrer">官方页面</a>
+        ${files.length ? `<button class="btn xs ghost" data-copyall="${id}">复制全部链接</button>` : ""}
+      </h4>
+      ${files.length ? `<table class="ft"><thead><tr>
+          <th>文件名</th>
+          <th class="num" style="width:92px">大小</th>
+          <th style="width:78px">版本</th>
+          <th class="num" style="width:100px" title="按发布时间倒序（最新在前）">发布时间 ↓</th>
+          ${hasDesc ? `<th style="width:18%">说明</th>` : ""}
+          <th style="width:64px">安全</th>
+          <th class="num" style="width:198px">下载链接</th>
+        </tr></thead><tbody>
+        ${files.map(f => `<tr>
+          <td title="${esc(f.name)}">${esc(f.name)}</td>
+          <td class="num">${fmtSize(f.size)}</td>
+          <td title="${esc(f.version || "")}">${esc(f.version || "—")}</td>
+          <td class="num">${fmtPub(f)}</td>
+          ${hasDesc ? `<td class="dim" title="${esc(f.desc || "")}">${esc(f.desc || "")}</td>` : ""}
+          <td>${f.av === "clean" ? '<span class="ok-t">clean</span>' : esc(f.av || "—")}</td>
+          <td>
+            <div class="btnrow">
+              <button class="btn xs accent" data-gbdl="${esc(f.url)}" data-gbname="${esc(f.name)}" data-gbsize="${f.size || 0}" data-gbmod="${id}">下载</button>
+              <button class="btn xs" data-copy="${esc(f.url)}">复制</button>
+              <a class="btn xs ghost" href="${esc(f.url)}" data-openurl="${esc(f.url)}" target="_blank" rel="noreferrer">打开</a>
+            </div>
+          </td></tr>`).join("")}
+        </tbody></table>`
+        : `<div class="dim">该 Mod 当前没有任何可下载文件。</div>`}`;
+  } catch (e) {
+    box.innerHTML = `<div class="bad-t">加载失败：${esc(e.message)}</div>`;
+  }
+}
+
+/* ---------------- 选择 ---------------- */
+function updateSelBar() {
+  const n = S.selected.size;
+  $("#selInfo").textContent = n ? `已选 ${n} 个 Mod` : "未选择";
+  $("#fmSelCount").textContent = n;
+  $("#btnFetchSel").disabled = !n;
+  $("#btnCopySel").disabled = !n;
+  $("#btnExportSel").disabled = !n;
+}
+
+/* ---------------- 任务 ---------------- */
+function taskText(t) {
+  const base = t.message || "";
+  const extra = [];
+  if (t.state === "running" && t.eta_seconds != null) extra.push("预计剩余 " + fmtDur(t.eta_seconds));
+  if (t.state === "running" && t.rate) extra.push(`速率 ${t.rate} 个/秒`);
+  return `${t.label}：${base}` + (extra.length ? " · " + extra.join(" · ") : "");
+}
+
+function applyTask(t) {
+  const running = t.state === "running";
+  const idle = !t.state || t.state === "idle";
+  S.running = running;
+  $("#taskCard").classList.toggle("hidden", idle);
+  $("#btnStop").classList.toggle("hidden", !running);
+  if (!idle) $("#taskLabel").textContent = t.label || "任务";
+  const pct = t.total ? Math.min(100, Math.round(t.done / t.total * 100)) : 0;
+  $("#barFill").style.width = pct + "%";
+  $("#progressText").textContent = idle ? "" : taskText(t);
+  if (!running && S.timer) { clearInterval(S.timer); S.timer = null; }
+}
+
+async function refreshAll() {
+  await loadStats();
+  await loadMods();
+  try { await nxLoadSettings(); } catch (e) { /* Nexus 面板异常不阻塞主流程 */ }
+  if (SRC === "nexus") { try { await nxLoad(); } catch (e) { /* 忽略 */ } }
+  if (S.stats && S.stats.task && S.stats.task.state === "running") startPolling();
+  applyTask((S.stats && S.stats.task) || { state: "idle" });
+  if (S.stats.task && S.stats.task.state === "running") startPolling();   // 自动同步触发时界面跟进
+  renderChips();
+}
+
+function startPolling() {
+  if (S.timer) return;
+  S.lastTaskState = "idle";
+  S.timer = setInterval(async () => {
+    try {
+      const st = await api("/api/stats");
+      S.stats = st;
+      const t = st.task || { state: "idle" };
+      const prev = S.running;
+      applyTask(t);
+      updateFetchEst();
+      // 任务从 running 变为结束（无论本页触发还是后台/外部触发）→ 一次性完整刷新
+      const was = S.lastTaskState === "running";
+      S.lastTaskState = t.state;
+      if (was && t.state !== "running") {
+        const failed = t.state === "failed";
+        toast(t.state === "done" ? "任务完成" : (t.message || "任务已结束"), failed ? "err" : "ok");
+        S.detailCache.clear(); NX.cache.clear();
+        await loadStats();
+        try { await nxLoadSettings(); } catch (e) { /* 忽略 */ }
+        if (SRC === "gb") await loadMods(); else await nxLoad();
+        renderChips();
+      }
+    } catch (e) { /* 网络抖动忽略 */ }
+  }, 1000);
+}
+
+/* ---------------- 抓取估算 ---------------- */
+function pendingGuess() {
+  const st = S.stats; if (!st) return 0;
+  return Math.max(0, (st.total_mods || 0) - (st.fetched_mods || 0));
+}
+function updateFetchEst() {
+  const mode = document.querySelector('input[name=fmode]:checked')?.value || "filter";
+  const noLimit = $("#fmNoLimit").checked;
+  const limit = parseInt($("#fmLimit").value || "200", 10);
+  const iv = parseFloat($("#selInterval").value || "1");
+  let n = pendingGuess(), label = "全部未抓取";
+  if (mode === "ids") { n = S.selected.size; label = "已勾选"; }
+  else if (mode === "filter") { label = "当前筛选"; if (!noLimit) n = Math.min(n, limit); }
+  else if (noLimit) n = pendingGuess();
+  $("#fmEst").textContent = n
+    ? `预计抓取最多 ${fmtN(n)} 个（${label}）· 约 ${fmtDur(n * iv)}`
+    : "没有待抓取项（或未勾选）";
+}
+
+/* ---------------- 导出 ---------------- */
+function doExport(scope, format) {
+  if (scope === "ids" && !S.selected.size) { toast("请先勾选 Mod", "err"); return; }
+  const p = new URLSearchParams({ scope, format });
+  if (scope === "filter") {
+    p.set("q", S.q); p.set("char", S.char); p.set("sort", S.sort);
+    p.set("rated", S.rated); p.set("fetched", S.fetched);
+  }
+  if (scope === "ids") p.set("ids", [...S.selected].join(","));
+  window.location.href = "/api/export?" + p.toString();
+  toast("正在导出…已同时保存到 exports 目录", "ok");
+}
+
+/* ---------------- 事件绑定 ---------------- */
+$("#btnSync").onclick = async () => {
+  try { await post("/api/sync", {}); toast("开始同步 Mod 列表…", "ok"); startPolling(); }
+  catch (e) { toast(e.message, "err"); }
+};
+
+$("#fmStart").onclick = async () => {
+  const mode = document.querySelector('input[name=fmode]:checked')?.value || "filter";
+  const force = $("#fmForce").checked;
+  const noLimit = $("#fmNoLimit").checked;
+  const limit = noLimit ? null : (parseInt($("#fmLimit").value || "0", 10) || null);
+  const body = { mode, force };
+  if (mode === "ids") body.ids = [...S.selected];
+  if (mode === "filter") { body.limit = limit;
+    body.filters = { q: S.q, char: S.char, sort: S.sort, rated: S.rated, fetched: S.fetched }; }
+  if (mode === "all") body.limit = limit;
+  try {
+    const r = await post("/api/links", body);
+    document.querySelectorAll(".dd.open").forEach(x => x.classList.remove("open"));
+    if (r.started) { toast(`已开始抓取 ${r.queued} 个 Mod 的下载链接`, "ok"); startPolling(); }
+    else toast(r.message || "没有需要抓取的 Mod", "");
+  } catch (e) { toast(e.message, "err"); }
+};
+
+$("#btnStop").onclick = async () => {
+  try { await post("/api/stop", {}); toast("正在停止，已抓取的进度会保留…"); }
+  catch (e) { toast(e.message, "err"); }
+};
+
+document.querySelectorAll("[data-exp]").forEach(el => el.addEventListener("click", () => {
+  const [scope, format] = el.dataset.exp.split("|");
+  doExport(scope, format);
+  document.querySelectorAll(".dd.open").forEach(x => x.classList.remove("open"));
+}));
+
+$("#tbody").addEventListener("click", async (e) => {
+  const t = e.target;
+  const fetchId = t.getAttribute("data-fetch");
+  if (fetchId) {
+    try { const r = await post("/api/links", { mode: "ids", ids: [parseInt(fetchId)] });
+      toast(r.started ? "已加入抓取队列（1 个）" : (r.message || "无需抓取"), r.started ? "ok" : "");
+      startPolling(); } catch (err) { toast(err.message, "err"); }
+    return;
+  }
+  const expId = t.getAttribute("data-exp");
+  if (expId) {
+    const id = parseInt(expId);
+    S.expanded.has(id) ? S.expanded.delete(id) : S.expanded.add(id);
+    renderTable();
+    return;
+  }
+  const copyUrl = t.getAttribute("data-copy");
+  if (copyUrl) { copy(copyUrl); return; }
+  const copyAll = t.getAttribute("data-copyall");
+  if (copyAll) {
+    const d = S.detailCache.get(parseInt(copyAll));
+    if (d) copy((d.files || []).map(f => f.url).join("\n"), "已复制 " + (d.files || []).length + " 条链接");
+    return;
+  }
+  if (t.getAttribute("data-cb")) {
+    const id = parseInt(t.getAttribute("data-cb"));
+    t.checked ? S.selected.add(id) : S.selected.delete(id);
+    updateSelBar(); updateFetchEst();
+    return;
+  }
+  // 行内空白点击：与点「详情」等效（展开/收起详情面板）
+  const row = t.closest("tr[data-id]");
+  if (row && !t.closest("a") && !t.closest("img[data-big]") && t.tagName !== "INPUT") {
+    const expBtn = row.querySelector('[data-exp]');
+    if (expBtn) expBtn.click();
+    return;
+  }
+});
+
+function copy(text, msg) {
+  const done = () => toast(msg || "已复制到剪贴板", "ok");
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallback());
+  } else fallback();
+  function fallback() {
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); done(); } catch (e) { toast("复制失败", "err"); }
+    ta.remove();
+  }
+}
+
+$("#btnSelPage").onclick = () => { S.items.forEach(m => S.selected.add(m.id)); renderTable(); updateFetchEst(); };
+$("#btnSelClear").onclick = () => { S.selected.clear(); renderTable(); updateFetchEst(); };
+$("#btnFetchSel").onclick = async () => {
+  try {
+    const r = await post("/api/links", { mode: "ids", ids: [...S.selected] });
+    toast(r.started ? `已开始抓取 ${r.queued} 个（已跳过抓取过的）` : (r.message || "无需抓取"), r.started ? "ok" : "");
+    startPolling();
+  } catch (e) { toast(e.message, "err"); }
+};
+$("#btnCopySel").onclick = async () => {
+  const ids = [...S.selected].join(",");
+  try {
+    const r = await fetch("/api/links.txt?ids=" + ids);
+    const text = await r.text();
+    if (!text.trim()) { toast("所选 Mod 还没有抓取过链接，请先抓取", "err"); return; }
+    copy(text, "已复制所选 Mod 的全部下载链接");
+  } catch (e) { toast("复制失败：" + e.message, "err"); }
+};
+$("#btnExportSel").onclick = () => doExport("ids", "csv");
+
+/* 筛选器 */
+let qTimer = null;
+$("#inpQ").addEventListener("input", () => {
+  clearTimeout(qTimer);
+  qTimer = setTimeout(() => { S.q = $("#inpQ").value.trim(); S.page = 1; loadMods(); }, 400);
+});
+$("#selChar").onchange = () => { S.char = $("#selChar").value; S.page = 1; loadMods(); };
+$("#selSort").onchange = () => { S.sort = $("#selSort").value; S.page = 1; loadMods(); };
+$("#selRated").onchange = () => { S.rated = $("#selRated").value; S.page = 1; loadMods(); };
+$("#selFetched").onchange = () => { S.fetched = $("#selFetched").value; S.page = 1; loadMods(); };
+$("#selPerpage").onchange = () => { S.perpage = parseInt($("#selPerpage").value, 10); S.page = 1; loadMods(); };
+
+/* 分页 */
+function goPage(p) {
+  const pages = Math.max(1, Math.ceil(S.total / S.perpage));
+  S.page = Math.min(Math.max(1, p), pages);
+  loadMods();
+}
+$("#pgFirst").onclick = () => goPage(1);
+$("#pgPrev").onclick = () => goPage(S.page - 1);
+$("#pgNext").onclick = () => goPage(S.page + 1);
+$("#pgLast").onclick = () => goPage(Math.ceil(S.total / S.perpage));
+$("#pgGo").onclick = () => goPage(parseInt($("#pgJump").value || "1", 10));
+
+/* 间隔设置 */
+$("#selInterval").onchange = async () => {
+  const v = parseFloat($("#selInterval").value);
+  try { await post("/api/settings", { min_interval: v }); toast(`请求间隔已设为 ${v} 秒/次`, "ok"); updateFetchEst(); }
+  catch (e) { toast(e.message, "err"); }
+};
+
+/* 抓取菜单可交互元素 */
+document.querySelectorAll('input[name=fmode]').forEach(r => r.addEventListener("change", updateFetchEst));
+$("#fmNoLimit").addEventListener("change", updateFetchEst);
+$("#fmLimit").addEventListener("input", updateFetchEst);
+
+/* 下拉开关 */
+document.querySelectorAll(".dd").forEach(dd => {
+  const btn = dd.querySelector("[data-dd]");
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const open = dd.classList.contains("open");
+    document.querySelectorAll(".dd.open").forEach(x => x.classList.remove("open"));
+    if (!open) { dd.classList.add("open"); updateFetchEst(); }
+  });
+  dd.querySelector(".dd-panel").addEventListener("click", (e) => e.stopPropagation());
+});
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("[data-openurl]");
+  if (el) { e.preventDefault(); openExt(el.getAttribute("data-openurl")); }
+});
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("[data-nxcopy]");
+  if (el && !el.closest("#nxTbody")) copy(el.getAttribute("data-nxcopy"));
+});
+document.addEventListener("click", async (e) => {
+  const g = e.target.closest("[data-gbdl]");
+  if (g) {
+    try {
+      await post("/api/downloads/start", {
+        url: g.getAttribute("data-gbdl"),
+        name: g.getAttribute("data-gbname"),
+        size: parseInt(g.getAttribute("data-gbsize") || "0", 10) || 0,
+        mod_id: parseInt(g.getAttribute("data-gbmod") || "0", 10) || null,
+      });
+      toast("已开始下载，可在「④ 下载管理」查看进度", "ok");
+      openDlModal();
+    } catch (err) { toast("下载失败：" + err.message, "err"); }
+    return;
+  }
+  const cx = e.target.closest("[data-dlcancel]");
+  if (cx) {
+    post("/api/downloads/cancel", { id: cx.getAttribute("data-dlcancel") })
+      .then(() => renderDownloads()).catch(() => {});
+    return;
+  }
+  const dl = e.target.closest("[data-dldel]");
+  if (dl) {
+    post("/api/downloads/delete", { id: dl.getAttribute("data-dldel") })
+      .then(() => renderDownloads()).catch(() => {});
+    return;
+  }
+  const el = e.target.closest("[data-desctoggle]");
+  if (el) {
+    const [src, id] = el.getAttribute("data-desctoggle").split(":");
+      const body = document.getElementById(`descbody-${src}-${id}`);
+      if (body) {
+        body.classList.toggle("hidden");
+        const openNow = !body.classList.contains("hidden");
+        if (openNow) DESC_OPEN.add(src + ":" + id); else DESC_OPEN.delete(src + ":" + id);
+        const btn = el.querySelector(".btn");
+        if (btn) btn.textContent = openNow ? "收起 ▴" : "展开 ▾";
+      }
+    return;
+  }
+  const tr = e.target.closest("[data-transdesc]");
+  if (tr) {
+    const [src, id] = tr.getAttribute("data-transdesc").split(":");
+    transDesc(src, parseInt(id), tr);
+  }
+});
+
+/* 图片加载失败时回退到存储地址（个别图可能缺少轻量档） */
+document.addEventListener("error", (e) => {
+  const el = e.target;
+  if (el && el.tagName === "IMG" && el.dataset && el.dataset.fallback &&
+      el.getAttribute("src") !== el.dataset.fallback) {
+    el.src = el.dataset.fallback;
+  }
+}, true);
+
+document.addEventListener("click", () => document.querySelectorAll(".dd.open").forEach(x => x.classList.remove("open")));
+
+/* ================= Nexus 模块 ================= */
+const NX = {
+  q: "", sort: "updated_desc", files: "all", adult: "all",
+  page: 1, perpage: 50, total: 0, items: [],
+  selected: new Set(), expanded: new Set(), cache: new Map(), settings: null,
+  lastInboxTs: 0, inboxInit: false,
+};
+
+function rlRate(rate, key) {
+  if (!rate) return "";
+  const want = ("x-rl-" + key).toLowerCase();
+  for (const k in rate) { if (k.toLowerCase() === want) return rate[k]; }
+  return "";
+}
+
+async function nxLoadSettings() {
+  NX.settings = await api("/api/nexus/settings");
+  const s = NX.settings, st = s.stats || {};
+  $("#cntNx").textContent = st.total_mods ? `（${fmtN(st.total_mods)}）` : "";
+  const keyInfo = s.has_key
+    ? `已配置（${esc(s.key_hint || "")}${s.user ? " · " + esc(s.user) : ""}${s.is_premium ? " · Premium 会员" : " · 非会员"}）`
+    : "未配置（仅影响下载直链；列表与文件信息不受影响）";
+  const daily = rlRate(s.rate, "daily-remaining");
+  $("#nxStatus").innerHTML = [
+    `本地数据：${fmtN(st.total_mods)} 个 Mod ｜ 已抓文件信息 ${fmtN(st.files_fetched)} ｜ 文件 ${fmtN(st.total_files)}`,
+    `API Key：${s.has_key ? "已配置" : "未配置"}`,
+    `上次同步：${st.last_sync_ts ? new Date(st.last_sync_ts * 1000).toLocaleString("zh-CN") : "—"}`,
+  ].filter(Boolean).join("　｜　");
+  // 设置弹窗里的详情
+  const ks = $("#stKeyStatus");
+  if (ks) ks.innerHTML = `当前：${keyInfo}` + (daily !== "" ? `　｜　当日剩余配额：${daily}` : "");
+  // NXM 区块：仅当该游戏存在支持管理器下载的 Mod 时才显示（当前鸣潮不支持 → 自动隐藏）
+  const sec = $("#nxmSec");
+  if (sec) sec.classList.toggle("hidden", !s.nxm_usable);
+  const ns = $("#stNxmStatus");
+  if (ns) ns.innerHTML = s.nxm_usable
+    ? `已接入${s.nxm_registered ? "" : "（未注册处理器）"}：在 Nexus 网页点「Mod manager download」，直链会自动进入收件箱并复制到剪贴板`
+    : "未接入";
+  if (SRC === "nexus") renderChips();
+  updateNxEst();
+  await nxLoadInbox();
+}
+
+async function nxLoadInbox() {
+  const wrap = $("#nxInboxWrap"), list = $("#nxInboxList");
+  if (!wrap) return;
+  try {
+    const d = await api("/api/nexus/inbox");
+    const items = d.items || [];
+    if (!items.length) { wrap.classList.add("hidden"); NX.inboxInit = true; return; }
+    wrap.classList.remove("hidden");
+    list.innerHTML = items.map(it => `
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:5px 0;border-bottom:1px solid #1a2130;font-size:12.5px">
+        <span class="dim">${new Date(it.ts * 1000).toLocaleTimeString("zh-CN")}</span>
+        <span>Mod ${it.mod_id} / 文件 ${it.file_id}</span>
+        ${it.ok
+          ? `<a class="btn xs ghost" href="${esc(it.link)}" data-openurl="${esc(it.link)}" target="_blank" rel="noreferrer">浏览器下载</a>
+             <button class="btn xs accent" data-nxcopy="${esc(it.link)}">复制直链</button>
+             ${it.copied ? '<span class="dim">已自动复制到剪贴板</span>' : ""}`
+          : `<span class="bad-t">${esc(String(it.message || "解析失败").slice(0, 90))}</span>
+             ${it.manual_url ? `<a class="btn xs ghost" href="${esc(it.manual_url)}" data-openurl="${esc(it.manual_url)}" target="_blank" rel="noreferrer">文件页</a>` : ""}`}
+      </div>`).join("");
+    const top = items[0].ts || 0;
+    if (top > NX.lastInboxTs) {
+      if (NX.inboxInit) {
+        toast(items[0].ok ? "收到新的下载直链（已复制到剪贴板）" : "nxm 请求处理失败，详见收件箱", items[0].ok ? "ok" : "err");
+      }
+      NX.lastInboxTs = top;
+    }
+    NX.inboxInit = true;
+  } catch (e) { /* 忽略网络抖动 */ }
+}
+
+function nxParams(extra) {
+  const p = new URLSearchParams({
+    q: NX.q, sort: NX.sort, files: NX.files, adult: NX.adult,
+    page: NX.page, perpage: NX.perpage,
+  });
+  if (extra) for (const k in extra) p.set(k, extra[k]);
+  return p;
+}
+
+async function nxLoad() {
+  const d = await api("/api/nexus/mods?" + nxParams().toString());
+  NX.total = d.total; NX.items = d.items;
+  nxRender(); nxRenderPager();
+}
+
+function nxThumb(m) {
+  if (!m.thumb) return `<div class="ph">${m.adult ? "18+" : "无图"}</div>`;
+  return `<img loading="lazy" decoding="async" src="${esc(m.thumb)}" class="${m.adult && BLUR ? "blurred" : ""}"
+    data-thumb="${m.id}" data-big="${esc(m.picture || m.thumb)}" data-cap="${esc(m.name)}"
+    title="点击放大查看" alt="">`;
+}
+
+function nxStatusHtml(m) {
+  if (m.last_error && !m.files_fetched) return `<span class="badge bad">失败</span> <span class="dim">${esc((m.last_error || "").slice(0, 40))}</span>`;
+  if (m.files_fetched) {
+    return (m.file_count || 0) > 0 ? `<span class="badge ok">${m.file_count} 个文件</span>` : `<span class="badge warn">无文件</span>`;
+  }
+  return `<span class="badge">未抓取</span>`;
+}
+
+function nxRender() {
+  const tb = $("#nxTbody");
+  if (!NX.items.length) {
+    tb.innerHTML = "";
+    const e = $("#nxEmpty");
+    e.classList.remove("hidden");
+    e.innerHTML = (NX.settings && NX.settings.stats.total_mods === 0)
+      ? `<div class="big">本地还没有 Nexus 数据</div>点击「① 同步 Nexus 列表」开始（约 10 秒）`
+      : `<div class="big">没有符合条件的 Mod</div>试试调整筛选条件`;
+    return;
+  }
+  $("#nxEmpty").classList.add("hidden");
+  tb.innerHTML = NX.items.map(m => {
+    const checked = NX.selected.has(m.id) ? "checked" : "";
+    const isExp = NX.expanded.has(m.id);
+    const row = `<tr data-id="${m.id}">
+      <td><input type="checkbox" data-nxcb="${m.id}" ${checked}></td>
+      <td class="thumb">${nxThumb(m)}</td>
+      <td>
+        <a href="${esc(m.url)}" data-openurl="${esc(m.url)}" target="_blank" rel="noreferrer">${esc(m.name)}</a>
+        ${m.version ? `<span class="badge">${esc(m.version)}</span>` : ""}
+        ${m.adult ? `<span class="badge warn">18+</span>` : ""}
+        <div class="dim">by ${esc(m.author || "?")}${m.category ? " · " + esc(m.category) : ""}</div>
+      </td>
+      <td>${nxStatusHtml(m)}</td>
+      <td class="num">${fmtN(m.downloads)}</td>
+      <td class="num">${fmtN(m.endorsements)}</td>
+      <td class="dim">${fmtDate(m.updated_ts)}</td>
+      <td>
+        ${m.files_fetched ? "" : `<button class="btn xs accent" data-nxfetch="${m.id}">抓取文件</button>`}
+        <button class="btn xs ghost" data-nxexp="${m.id}">${isExp ? "收起" : "详情"}</button>
+      </td>
+    </tr>`;
+    const exp = isExp ? `<tr class="exp"><td colspan="8"><div class="files" id="nxfiles-${m.id}">加载中…</div></td></tr>` : "";
+    return row + exp;
+  }).join("");
+  NX.expanded.forEach(id => nxLoadDetail(id));
+  nxUpdateSelBar();
+}
+
+function nxRenderPager() {
+  const pages = Math.max(1, Math.ceil(NX.total / NX.perpage));
+  $("#nxPgInfo").textContent = `第 ${NX.page} / ${pages} 页 · 共 ${fmtN(NX.total)} 条`;
+  $("#nxPgPrev").disabled = $("#nxPgFirst").disabled = NX.page <= 1;
+  $("#nxPgNext").disabled = $("#nxPgLast").disabled = NX.page >= pages;
+}
+
+function nxManualUrl(mid, fid) {
+  return `https://www.nexusmods.com/wutheringwaves/mods/${mid}?tab=files&file_id=${fid}`;
+}
+
+async function nxLoadDetail(id) {
+  const box = document.getElementById("nxfiles-" + id);
+  if (!box) return;
+  try {
+    let d = NX.cache.get(id);
+    if (!d) { d = await api("/api/nexus/mods/" + id); NX.cache.set(id, d); }
+    const files = d.files || [];
+    if (!d.descLoaded && !d.descLoading) loadDesc("nx", id);   // 展开详情自动获取简介
+    if (!files.length) {
+      box.innerHTML = descBlockHtml("nx", id, d)
+        + `<div class="dim">该 Mod 暂无可列出的文件（或尚未抓取文件信息）。</div>`;
+      return;
+    }
+    const LIMIT = 200;
+    const shown = files.slice(0, LIMIT);
+    box.innerHTML = descBlockHtml("nx", id, d) + `
+      <h4>${files.length} 个文件 · <a href="${esc(d.url)}" data-openurl="${esc(d.url)}" target="_blank" rel="noreferrer">Mod 页面</a>
+        <button class="btn xs ghost" data-nxopenall="${id}">打开全部文件页（最多 10 个）</button>
+        <button class="btn xs ghost" data-nxcopyall="${id}">复制全部文件页链接</button>
+        ${files.length > LIMIT ? `<span class="dim">（列表仅显示前 ${LIMIT} 个，导出与复制包含全部）</span>` : ""}</h4>
+      <table class="ft"><thead><tr>
+          <th>文件名</th>
+          <th class="num" style="width:88px">大小</th>
+          <th style="width:78px">版本</th>
+          <th style="width:86px">分类</th>
+          <th class="num" style="width:82px">下载量</th>
+          <th class="num" style="width:100px" title="按发布时间倒序（最新在前）">发布时间 ↓</th>
+          <th class="num" style="width:230px">下载</th>
+        </tr></thead><tbody>
+        ${shown.map(f => `<tr>
+          <td title="${esc(f.name)}">${esc(f.name)}${f.desc ? `<div class="dim">${esc(String(f.desc).slice(0, 90))}</div>` : ""}</td>
+          <td class="num">${fmtSize(f.size)}</td>
+          <td>${esc(f.version || "—")}</td>
+          <td>${esc(f.category || "—")}</td>
+          <td class="num">${fmtN(f.downloads)}</td>
+          <td class="num">${fmtPub(f)}</td>
+          <td>
+            <div class="btnrow">
+              <button class="btn xs accent" data-nxdl="${id}:${f.id}">获取直链</button>
+              <a class="btn xs ghost" href="${esc(nxManualUrl(id, f.id))}" data-openurl="${esc(nxManualUrl(id, f.id))}" target="_blank" rel="noreferrer">文件页</a>
+              <span class="nxdl" id="nxdl-${id}-${f.id}"></span>
+            </div>
+          </td></tr>`).join("")}
+        </tbody></table>`;
+  } catch (e) {
+    box.innerHTML = `<div class="bad-t">加载失败：${esc(e.message)}</div>`;
+  }
+}
+
+async function nxGetLink(mid, fid) {
+  const box = document.getElementById(`nxdl-${mid}-${fid}`);
+  if (!box) return;
+  box.innerHTML = '<span class="dim">获取中…</span>';
+  try {
+    const r = await api(`/api/nexus/download?mod_id=${mid}&file_id=${fid}`);
+    if (r.ok && r.links && r.links.length) {
+      const u = r.links[0].uri;
+      box.innerHTML = `<a class="btn xs accent" href="${esc(u)}" target="_blank" rel="noreferrer">下载</a>
+        <button class="btn xs ghost" data-nxcopy="${esc(u)}">复制直链</button>`;
+    } else {
+      box.innerHTML = `<span class="warn-t" style="font-size:12px">${esc(r.message || "无法获取直链")}</span>`
+        + `<span class="dim" style="font-size:12px">　已自动打开文件页</span>`;
+      if (r.manual_url) openExt(r.manual_url);
+    }
+  } catch (e) {
+    box.innerHTML = `<span class="bad-t" style="font-size:12px">${esc(e.message)}</span>`;
+  }
+}
+
+function nxUpdateSelBar() {
+  const n = NX.selected.size;
+  $("#nxSelInfo").textContent = n ? `已选 ${n} 个 Mod` : "未选择";
+  $("#nxSelCount").textContent = n;
+  $("#nxFetchSel").disabled = !n;
+  $("#nxCopySel").disabled = !n;
+  $("#nxExportSel").disabled = !n;
+}
+
+function updateNxEst() {
+  const st = NX.settings && NX.settings.stats;
+  if (!st) return;
+  const mode = document.querySelector("input[name=nxmode]:checked")?.value || "all";
+  const iv = parseFloat($("#selInterval").value || "1");
+  let n = Math.max(0, (st.total_mods || 0) - (st.files_fetched || 0));
+  let label = "全部未抓取";
+  if (mode === "ids") { n = NX.selected.size; label = "已勾选"; }
+  if (mode === "filter") label = "当前筛选";
+  $("#nxEst").textContent = n
+    ? `预计抓取 ${fmtN(n)} 个（${label}）· 约 ${fmtDur(n * iv)}`
+    : "没有待抓取项（或未勾选）";
+}
+
+function nxGoPage(p) {
+  const pages = Math.max(1, Math.ceil(NX.total / NX.perpage));
+  NX.page = Math.min(Math.max(1, p), pages);
+  nxLoad();
+}
+
+function nxExport(scope, format) {
+  if (scope === "ids" && !NX.selected.size) { toast("请先勾选 Mod", "err"); return; }
+  const p = new URLSearchParams({ scope, format });
+  if (scope === "filter") {
+    p.set("q", NX.q); p.set("sort", NX.sort); p.set("files", NX.files); p.set("adult", NX.adult);
+  }
+  if (scope === "ids") p.set("ids", [...NX.selected].join(","));
+  window.location.href = "/api/nexus/export?" + p.toString();
+  toast("正在导出…已同时保存到 exports 目录", "ok");
+}
+
+/* ---------------- Nexus 事件绑定 ---------------- */
+$("#nxSync").onclick = async () => {
+  try { await post("/api/nexus/sync", {}); toast("开始同步 Nexus 列表…", "ok"); startPolling(); }
+  catch (e) { toast(e.message, "err"); }
+};
+$("#nxStart").onclick = async () => {
+  const mode = document.querySelector("input[name=nxmode]:checked")?.value || "all";
+  const body = { mode, force: $("#nxForce").checked };
+  if (mode === "ids") body.ids = [...NX.selected];
+  if (mode === "filter") body.filters = { q: NX.q, sort: NX.sort, files: NX.files, adult: NX.adult };
+  try {
+    const r = await post("/api/nexus/files", body);
+    document.querySelectorAll(".dd.open").forEach(x => x.classList.remove("open"));
+    if (r.started) { toast(`已开始抓取 ${r.queued} 个 Mod 的文件信息`, "ok"); startPolling(); }
+    else toast(r.message || "没有需要抓取的 Mod", "");
+  } catch (e) { toast(e.message, "err"); }
+};
+$("#nxKeySave").onclick = async () => {
+  const k = $("#nxKey").value.trim();
+  if (!k) { toast("请输入 API Key（如需移除已保存的 Key，请点「清除」按钮）", "err"); return; }
+  try {
+    const r = await post("/api/nexus/key", { api_key: k });
+    toast(r.cleared ? "已清除 API Key"
+      : `验证成功：${r.user || ""}${r.is_premium ? "（Premium 会员）" : "（非会员，可获取文件信息与手动下载页）"}`, "ok");
+    $("#nxKey").value = "";
+    await nxLoadSettings();
+  } catch (e) { toast(e.message, "err"); }
+};
+$("#nxKeyClear").onclick = async () => {
+  if (!window.confirm("确定要清除已保存的 Nexus API Key 吗？清除后将无法自动获取下载直链。")) return;
+  try { await post("/api/nexus/key", { api_key: "" }); toast("已清除 API Key", "ok"); await nxLoadSettings(); }
+  catch (e) { toast(e.message, "err"); }
+};
+document.querySelectorAll("[data-nexp]").forEach(el => el.addEventListener("click", () => {
+  const [scope, format] = el.dataset.nexp.split("|");
+  nxExport(scope, format);
+  document.querySelectorAll(".dd.open").forEach(x => x.classList.remove("open"));
+}));
+$("#nxTbody").addEventListener("click", async (e) => {
+  const t = e.target;
+  const fetchId = t.getAttribute("data-nxfetch");
+  if (fetchId) {
+    try {
+      const r = await post("/api/nexus/files", { mode: "ids", ids: [parseInt(fetchId)] });
+      toast(r.started ? "已加入抓取队列（1 个）" : (r.message || "无需抓取"), r.started ? "ok" : "");
+      startPolling();
+    } catch (err) { toast(err.message, "err"); }
+    return;
+  }
+  const expId = t.getAttribute("data-nxexp");
+  if (expId) {
+    const id = parseInt(expId);
+    NX.expanded.has(id) ? NX.expanded.delete(id) : NX.expanded.add(id);
+    nxRender();
+    return;
+  }
+  const dl = t.getAttribute("data-nxdl");
+  if (dl) { const [mid, fid] = dl.split(":").map(Number); nxGetLink(mid, fid); return; }
+  const cp = t.getAttribute("data-nxcopy");
+  if (cp) { copy(cp); return; }
+  const openAll = t.getAttribute("data-nxopenall");
+  if (openAll) {
+    const d = NX.cache.get(parseInt(openAll));
+    if (!d || !d.files || !d.files.length) { toast("请先抓取该 Mod 的文件信息", "err"); return; }
+    const list = d.files.slice(0, 10);
+    list.forEach((f) => openExt(nxManualUrl(d.id, f.id)));
+    toast(`正在浏览器中打开 ${list.length} 个文件页` + (d.files.length > 10 ? "（超过 10 个时仅打开前 10 个）" : ""), "ok");
+    return;
+  }
+  const cpa = t.getAttribute("data-nxcopyall");
+  if (cpa) {
+    const d = NX.cache.get(parseInt(cpa));
+    if (d && d.files) copy(d.files.map(f => nxManualUrl(d.id, f.id)).join("\n"), "已复制文件页链接");
+    return;
+  }
+  const cb = t.getAttribute("data-nxcb");
+  if (cb) {
+    const id = parseInt(cb);
+    t.checked ? NX.selected.add(id) : NX.selected.delete(id);
+    nxUpdateSelBar(); updateNxEst();
+    return;
+  }
+  // 行内空白点击：与点「详情」等效（展开/收起详情面板）
+  const row = t.closest("tr[data-id]");
+  if (row && !t.closest("a") && !t.closest("img[data-big]") && t.tagName !== "INPUT") {
+    const expBtn = row.querySelector('[data-nxexp]');
+    if (expBtn) expBtn.click();
+    return;
+  }
+});
+$("#nxSelPage").onclick = () => { NX.items.forEach(m => NX.selected.add(m.id)); nxRender(); updateNxEst(); };
+$("#nxSelClear").onclick = () => { NX.selected.clear(); nxRender(); updateNxEst(); };
+$("#nxFetchSel").onclick = async () => {
+  try {
+    const r = await post("/api/nexus/files", { mode: "ids", ids: [...NX.selected] });
+    toast(r.started ? `已开始抓取 ${r.queued} 个（已跳过抓取过的）` : (r.message || "无需抓取"), r.started ? "ok" : "");
+    startPolling();
+  } catch (e) { toast(e.message, "err"); }
+};
+$("#nxCopySel").onclick = async () => {
+  try {
+    const r = await fetch("/api/nexus/links.txt?ids=" + [...NX.selected].join(","));
+    const text = await r.text();
+    if (!text.trim()) { toast("所选 Mod 还没有文件信息，请先抓取", "err"); return; }
+    copy(text, "已复制所选 Mod 的文件页链接");
+  } catch (e) { toast("复制失败：" + e.message, "err"); }
+};
+$("#nxExportSel").onclick = () => nxExport("ids", "csv");
+
+let nxqTimer = null;
+$("#nxQ").addEventListener("input", () => {
+  clearTimeout(nxqTimer);
+  nxqTimer = setTimeout(() => { NX.q = $("#nxQ").value.trim(); NX.page = 1; nxLoad(); }, 400);
+});
+$("#nxSort").onchange = () => { NX.sort = $("#nxSort").value; NX.page = 1; nxLoad(); };
+$("#nxFiles").onchange = () => { NX.files = $("#nxFiles").value; NX.page = 1; nxLoad(); };
+$("#nxAdult").onchange = () => { NX.adult = $("#nxAdult").value; NX.page = 1; nxLoad(); };
+$("#nxPerpage").onchange = () => { NX.perpage = parseInt($("#nxPerpage").value, 10); NX.page = 1; nxLoad(); };
+$("#nxPgFirst").onclick = () => nxGoPage(1);
+$("#nxPgPrev").onclick = () => nxGoPage(NX.page - 1);
+$("#nxPgNext").onclick = () => nxGoPage(NX.page + 1);
+$("#nxPgLast").onclick = () => nxGoPage(Math.ceil(NX.total / NX.perpage));
+$("#nxPgGo").onclick = () => nxGoPage(parseInt($("#nxPgJump").value || "1", 10));
+document.querySelectorAll("input[name=nxmode]").forEach(r => r.addEventListener("change", updateNxEst));
+
+/* ---------------- 数据源切换 ---------------- */
+document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", async () => {
+  SRC = tab.dataset.src;
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === tab));
+  $("#wrapGb").classList.toggle("hidden", SRC !== "gb");
+  $("#wrapNexus").classList.toggle("hidden", SRC !== "nexus");
+  renderChips();
+  if (SRC === "nexus") {
+    try { await nxLoadSettings(); await nxLoad(); }
+    catch (e) { toast("Nexus 加载失败：" + e.message, "err"); }
+  }
+}));
+
+/* ---------------- 模糊开关 ---------------- */
+$("#chkBlur").addEventListener("change", async () => {
+  BLUR = $("#chkBlur").checked;
+  try {
+    await post("/api/settings", { blur_sensitive: BLUR ? 1 : 0 });
+    toast(BLUR ? "已开启：敏感预览图默认模糊" : "已关闭：全部预览图直接显示", "ok");
+  } catch (e) { toast(e.message, "err"); }
+  renderTable();
+  nxRender();
+});
+
+/* ---------------- 设置弹窗 ---------------- */
+function openSettings() {
+  $("#settingsModal").classList.remove("hidden");
+  nxLoadSettings().catch(() => {});
+  api("/api/downloads").then(d => {
+    const i = $("#setDlDir");
+    if (i && !i.value && Date.now() - (window._dlDirTouchTs || 0) > 60000) i.value = d.dir || "";
+  }).catch(() => {});
+}
+$("#setDlDirSave").onclick = async () => {
+  try {
+    await post("/api/settings", { download_dir: $("#setDlDir").value.trim() });
+    toast("下载目录已保存", "ok");
+  } catch (e) { toast(e.message, "err"); }
+};
+$("#chkAutoSync").onchange = async () => {
+  try {
+    await post("/api/settings", { auto_sync_daily: $("#chkAutoSync").checked });
+    toast($("#chkAutoSync").checked ? "每日自动同步已开启" : "每日自动同步已关闭", "ok");
+  } catch (e) { toast(e.message, "err"); }
+};
+$("#setThreadsSave").onclick = async () => {
+  try {
+    const v = Math.max(0, Math.min(10, parseInt($("#setThreads").value || "0", 10) || 0));
+    await post("/api/settings", { fetch_threads: v });
+    $("#setThreads").value = v;
+    toast(v === 0 ? "已切换为自动探测最优线程数" : `抓取并发线程数已设为 ${v}`, "ok");
+  } catch (e) { toast(e.message, "err"); }
+};
+async function checkUpdate(auto) {
+  try {
+    const r = await api("/api/update/check");
+    const bar = $("#updBar"), hint = $("#updHint");
+    if (!r.configured) {
+      if (hint) hint.textContent = "未配置更新清单地址";
+      if (!auto) toast("未配置更新清单地址（在上方填写并保存后生效）", "warn");
+      return;
+    }
+    if (r.error) {
+      if (hint) hint.textContent = `检查失败：${r.error}`;
+      if (!auto) toast("检查更新失败：" + r.error, "err");
+      return;
+    }
+    if (r.newer) {
+      $("#updText").textContent = `发现新版本 ${r.latest}（当前 ${r.current}）${r.notes ? "：" + r.notes : ""}`;
+      $("#updBtn").onclick = async () => {
+        try {
+          await post("/api/downloads/start", { url: r.url, name: `MCMODXZ-安装程序-v${r.latest}.exe` });
+          toast("新版本安装包已加入下载队列，完成后打开下载文件夹运行安装", "ok");
+          openDlModal();
+        } catch (e) { toast(e.message, "err"); }
+      };
+      bar.classList.remove("hidden");
+      if (hint) hint.textContent = `线上最新 ${r.latest}`;
+    } else {
+      bar.classList.add("hidden");
+      if (hint) hint.textContent = `已是最新版本（${r.current}）`;
+      if (!auto) toast(`已是最新版本（${r.current}）`, "ok");
+    }
+  } catch (e) { if (!auto) toast(e.message, "err"); }
+}
+$("#updClose").onclick = () => { clearInterval(_updCountdown); $("#updBar").classList.add("hidden"); };
+$("#setUpdateSave").onclick = async () => {
+  try {
+    await post("/api/settings", { update_url: $("#setUpdateUrl").value.trim() });
+    toast("更新清单地址已保存", "ok");
+  } catch (e) { toast(e.message, "err"); }
+};
+$("#btnCheckUpd").onclick = () => checkUpdate(false);
+let _pickTarget = null;   // 当前要填的输入框
+async function browseFolder(targetId) {
+  _pickTarget = targetId;
+  try {
+    const init = encodeURIComponent($(targetId).value.trim());
+    const r = await post("/api/pick_folder", { init }, 300000);   // 原生对话框（阻塞至选择完成）
+    if (r && r.path) {
+      $(targetId).value = r.path;
+      if (targetId === "#setDlDir") {
+        window._dlDirTouchTs = Date.now();
+        try { await post("/api/settings", { download_dir: r.path }); } catch (e) {}
+      }
+      if (targetId === "#setPrevFolder") {
+        try { await post("/api/settings", { prev_folder: r.path }); } catch (e) {}
+      }
+      toast(`已选择并保存：${r.path}`, "ok");
+      return;
+    }
+    if (r && r.path === "" && !r.unsupported) return;   // 用户取消
+  } catch (e) { /* 原生方式不可用 → 走浏览器选择器兜底 */ }
+  const inp = $("#dirPicker");
+  inp.value = "";
+  inp.click();            // 兜底：浏览器文件夹选择器（空文件夹场景受限）
+}
+$("#dirPicker").addEventListener("change", async () => {
+  const files = Array.from($("#dirPicker").files || []);
+  if (!files.length || !_pickTarget) return;
+  const folderName = (files[0].webkitRelativePath || "").split("/")[0];
+  if (!folderName) return;
+  const box = $(_pickTarget);
+  box.value = folderName;                       // 先占位
+  toast(`正在定位「${folderName}」的完整路径…`, "");
+  try {
+    const fl = files.slice(0, 150).map(f => ({ p: f.webkitRelativePath || "", s: f.size || 0 }));
+    const r = await post("/api/resolve_folder", { name: folderName, files: fl }, 90);
+    const ms = r.matches || [];
+    if (ms.length === 1) {
+      box.value = ms[0];
+      if (_pickTarget === "#setDlDir") {
+        window._dlDirTouchTs = Date.now();
+        try { await post("/api/settings", { download_dir: ms[0] }); } catch (e) {}
+      }
+      if (_pickTarget === "#setPrevFolder") {
+        try { await post("/api/settings", { prev_folder: ms[0] }); } catch (e) {}
+      }
+      toast(`已定位并保存：${ms[0]}`, "ok");
+    } else if (ms.length > 1) {
+      box.value = ms[0];
+      toast(`找到 ${ms.length} 个同名文件夹，已填第一个：${ms[0]}（其余 ${ms.slice(1).join("；")}）`, "warn");
+    } else {
+      toast(`无法自动定位「${folderName}」的绝对路径，请手动粘贴完整路径`, "warn");
+    }
+  } catch (e) { toast(e.message, "err"); }
+});
+$("#btnBrowseDlDir").onclick = () => { window._dlDirTouchTs = Date.now(); browseFolder("#setDlDir"); };
+$("#btnBrowsePrev").onclick = () => browseFolder("#setPrevFolder");
+(async () => {   // 自动探测 JASM/WWMI 管理的目录并静默预填（不打扰）
+  try {
+    const r = await api("/api/detect_jasm");
+    const wuwa = (r.jasm || []).find(x => x.game === "WuWa");
+    const box = $("#setPrevFolder");
+    if (wuwa && box && !box.value) box.value = wuwa.mods_dir;
+  } catch (e) { /* 探测失败不提示 */ }
+})();
+$("#btnFixPrev").onclick = async () => {
+  const f = $("#setPrevFolder").value.trim();
+  if (!f) { toast("请先填写 Mod 根文件夹路径", "err"); return; }
+  $("#btnFixPrev").disabled = true;
+  try {
+    await post("/api/fix_previews", { folder: f }, 30);
+    toast("开始补预览图…", "ok");
+    const timer = setInterval(async () => {
+      try {
+        const s = await api("/api/fix_previews");
+        const hint = $("#fixPrevHint");
+        if (s.running) {
+          if (hint) hint.textContent = `处理中…已补 ${s.fixed} 张，剩余 ${s.remaining}`;
+          return;
+        }
+        clearInterval(timer);
+        if (hint) hint.textContent = s.fixed ? `已完成：本次补 ${s.fixed} 张` : "";
+        const un = (s.unmatched || []).length;
+        toast(`补预览完成：本次补 ${s.fixed} 张` + (un ? `，${un} 个文件夹名称未匹配` : ""),
+              s.fixed ? "ok" : "warn");
+        $("#btnFixPrev").disabled = false;
+      } catch (e) { clearInterval(timer); $("#btnFixPrev").disabled = false; }
+    }, 2000);
+  } catch (e) {
+    toast(e.message, "err");
+    $("#btnFixPrev").disabled = false;
+  }
+};
+$("#btnQuit").onclick = () => {
+  if (confirm("确定退出 MCMODXZ 吗？\n\n后台服务会一并停止（快捷方式可随时重新打开）。")) {
+    post("/api/shutdown", {}).finally(() => { window.close(); });
+  }
+};
+function closeSettings() { $("#settingsModal").classList.add("hidden"); }
+$("#btnSettings").addEventListener("click", openSettings);
+$("#settingsClose").addEventListener("click", closeSettings);
+$("#settingsModal").addEventListener("click", (e) => {
+  if (e.target === $("#settingsModal")) closeSettings();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeSettings();
+    $("#imgModal").classList.add("hidden");
+    $("#dlModal").classList.add("hidden");
+    stopDlPoll();
+  }
+});
+
+/* ---------------- 更新提醒：检测文件变更，提示刷新（翻页不会重新加载程序） ---------------- */
+let UI_VER = null;
+let UPDATE_SEEN = false;
+async function checkUiVersion() {
+  try {
+    const h = await fetch("/api/health").then(r => r.json());
+    if (!h || !h.ui) return;                 // 服务端暂无版本字段：跳过
+    if (UI_VER === null) { UI_VER = h.ui; return; }
+    if (h.ui !== UI_VER && !UPDATE_SEEN) {
+      UPDATE_SEEN = true;
+      $("#updateBar").classList.remove("hidden");
+    }
+  } catch (e) { /* 忽略 */ }
+}
+$("#updateReload").addEventListener("click", () => location.reload());
+setInterval(checkUiVersion, 45000);
+
+/* ---------------- 应用内下载管理 ---------------- */
+let dlPollTimer = null;
+function openDlModal() { $("#dlModal").classList.remove("hidden"); renderDownloads(); }
+$("#dlAdd").onclick = async () => {
+  const u = $("#dlUrl").value.trim();
+  if (!/^https?:\/\//i.test(u)) { toast("请输入 http/https 开头的链接", "err"); return; }
+  try {
+    await post("/api/downloads/start", { url: u }, 30);
+    $("#dlUrl").value = "";
+    renderDownloads();
+    toast("已加入下载队列", "ok");
+  } catch (e) { toast(e.message, "err"); }
+};
+function stopDlPoll() { if (dlPollTimer) { clearTimeout(dlPollTimer); dlPollTimer = null; } }
+async function renderDownloads() {
+  try {
+    const d = await api("/api/downloads");
+    const list = d.downloads || [];
+    const box = $("#dlList");
+    if (!list.length) {
+      box.innerHTML = `<span class="dim">暂无下载任务——在 Mod 详情的文件列表里点「下载」即可开始。</span>`;
+      stopDlPoll();
+      return;
+    }
+    const active = list.filter(x => x.state === "downloading" || x.state === "queued").length;
+    box.innerHTML = list.map(x => {
+      const pct = x.size ? Math.min(100, Math.round(x.done / x.size * 100)) : (x.state === "done" ? 100 : 0);
+      const stateTxt = ({ queued: "排队中", downloading: "下载中", done: "完成", failed: "失败", cancelled: "已取消" })[x.state] || x.state;
+      const spd = x.rate_bps ? ` · ${(x.rate_bps / 1024).toFixed(0)} KB/s` : "";
+      const eta = x.eta_s != null && x.state === "downloading" && x.rate_bps ? ` · 剩余 ${fmtDur(x.eta_s)}` : "";
+      return `<div class="dlitem">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+          <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.name || x.path)}</span>
+          <span class="dim">${stateTxt}${x.state === "downloading" ? ` ${pct}%` : ""}</span>
+        </div>
+        <div class="dlbar"><i style="width:${pct}%"></i></div>
+        <div class="dim" style="font-size:11px">${x.phase ? esc(x.phase) + " · " : ""}${spd}${eta}</div>
+        <div class="dim" style="font-size:11px">${esc(x.path)}${x.state === "failed" ? " · " + esc(x.error || "") : ""}</div>
+        ${x.state === "downloading" || x.state === "queued" ? `<div style="margin-top:4px"><button class="btn xs ghost" data-dlcancel="${x.id}">取消</button></div>` : `<div style="margin-top:4px"><button class="btn xs ghost" data-dldel="${x.id}">删除记录</button></div>`}
+      </div>`;
+    }).join("");
+    if (active) { stopDlPoll(); dlPollTimer = setTimeout(renderDownloads, 1000); } else stopDlPoll();
+  } catch (e) { /* 忽略 */ }
+}
+$("#btnDlMgr").onclick = openDlModal;
+$("#dlClose").onclick = () => { $("#dlModal").classList.add("hidden"); stopDlPoll(); };
+$("#dlOpenDir").onclick = async () => { try { await post("/api/downloads/open", {}); } catch (e) { toast(e.message, "err"); } };
+$("#dlClear").onclick = async () => {
+  try { const r = await post("/api/downloads/clear", {}); toast(`已清空 ${r.removed} 条记录`, "ok"); renderDownloads(); }
+  catch (e) { toast(e.message, "err"); }
+};
+
+/* ---------------- 线路测速 ---------------- */
+$("#btnSpeed").onclick = async () => {
+  const btn = $("#btnSpeed"), box = $("#speedResult");
+  btn.disabled = true;
+  btn.textContent = "测速中…";
+  box.textContent = "";
+  try {
+    const r = await post("/api/speedtest", {});
+    box.innerHTML = (r.results || []).map(x => {
+      if (!x.ok) return `<div class="bad-t">${esc(x.name)}：失败（${esc(x.error || "超时或无数据")}）</div>`;
+      const kbps = x.rate_bps / 1024;
+      const lv = kbps >= 1024 ? (kbps / 1024).toFixed(1) + " MB/s" : kbps.toFixed(0) + " KB/s";
+      const ttfb = x.ttfb_ms != null ? ` · 延迟 ${x.ttfb_ms} ms` : "";
+      const via = x.via ? ` · ${x.via}` : "";
+      return `<div>${esc(x.name)}：<b>${lv}</b>${ttfb}${via} · 采样 ${fmtSize(x.bytes)}</div>`;
+    }).join("");
+  } catch (e) {
+    box.innerHTML = `<span class="bad-t">测速失败：${esc(e.message)}</span>`;
+  }
+  btn.disabled = false;
+  btn.textContent = "开始测速";
+};
+
+/* ---------------- 放大看图（灯箱：秒显当前图 → 按“中图→原图”链递进加载） ---------------- */
+function openImage(src, caption, blurred, chain) {
+  const img = $("#imgModalImg");
+  img.dataset.cap = caption || "";
+  img.dataset.chain = JSON.stringify(chain || []);
+  img.dataset.seq = String(Date.now()) + "-" + Math.random().toFixed(3);
+  img.src = src;
+  img.className = blurred ? "blurred" : "";
+  $("#imgModalCap").textContent = caption || "";
+  $("#imgModal").classList.remove("hidden");
+  if (!blurred) advanceChain();
+}
+function advanceChain() {
+  const img = $("#imgModalImg");
+  const cap = $("#imgModalCap");
+  const baseCap = img.dataset.cap || "";
+  const seq = img.dataset.seq;
+  let chain = [];
+  try { chain = JSON.parse(img.dataset.chain || "[]"); } catch (e) { /* 忽略 */ }
+  const next = chain.shift();
+  if (!next) { cap.textContent = baseCap; return; }
+  img.dataset.chain = JSON.stringify(chain);
+  if (img.src === next) { advanceChain(); return; }
+  cap.textContent = baseCap + "　（高清图加载中…）";
+  const pre = new Image();
+  const stillWanted = () => img.dataset.seq === seq;
+  pre.onload = () => {
+    if (!stillWanted()) return;                   // 期间已切换到其它图
+    img.src = next;
+    if (!$("#imgModal").classList.contains("hidden")) { cap.textContent = baseCap; advanceChain(); }
+  };
+  pre.onerror = () => {
+    if (stillWanted() && !$("#imgModal").classList.contains("hidden")) {
+      cap.textContent = baseCap + "　（更高清版本加载失败）";
+    }
+  };
+  pre.src = next;
+}
+$("#imgModal").addEventListener("click", (e) => {
+  const img = $("#imgModalImg");
+  if (e.target === img) {
+    if (img.classList.contains("blurred")) {      // 点图：先解锁，再继续加载高清链
+      img.classList.remove("blurred");
+      advanceChain();
+    }
+    return;                       // 点图不关闭；点其它区域关闭
+  }
+  $("#imgModal").classList.add("hidden");
+});
+document.addEventListener("click", (e) => {
+  const img = e.target.closest("img[data-big]");
+  if (!img) return;
+  const cur = img.currentSrc || img.getAttribute("src") || "";
+  // 仅当前图为小尺寸（GB 的 100/220）时才先升到中图；已是中图/原图则直接升原图
+  const isSmall = /\/(\d+)-90_/.test(cur);
+  const candidates = isSmall
+    ? [img.getAttribute("data-mid"), img.getAttribute("data-big")]
+    : [img.getAttribute("data-big")];
+  const chain = [];
+  for (const u of candidates) {
+    if (u && u !== cur && !chain.includes(u)) chain.push(u);
+  }
+  openImage(cur, img.getAttribute("data-cap"), img.classList.contains("blurred"), chain);
+});
+
+/* Nexus 标签页激活时，每 6 秒刷新（用于自动接收 nxm 直链） */
+setInterval(() => {
+  if (SRC === "nexus" && !document.hidden) nxLoadSettings().catch(() => {});
+}, 6000);
+
+/* 启动 */
+(async () => {
+  try {
+    await refreshAll();
+    startPolling();   // 常驻监视：后台触发的任务也能实时更新界面
+    checkUpdate(true);   // 启动静默检查新版本（配置了清单地址才生效）
+    /* 更新安装包下载完成 → 横幅变"立即安装"（全自动更新闭环的最后一步） */
+    let _updCountdown = null;
+    function updReadyUI(pth) {
+      const tx = $("#updText"), bn = $("#updBtn");
+      if (!tx || !bn) return;
+      let left = 10;
+      const tick = () => {
+        if (left <= 0) { clearInterval(_updCountdown); runInstall(pth); return; }
+        tx.textContent = `新版本安装包已就绪，${left} 秒后自动开始安装（将自动关闭应用并在安装后重启）`;
+        left -= 1;
+      };
+      bn.textContent = "立即安装";
+      bn.onclick = () => { clearInterval(_updCountdown); runInstall(pth); };
+      $("#updBar").classList.remove("hidden");
+      tick();
+      _updCountdown = setInterval(tick, 1000);
+    }
+    async function runInstall(pth) {
+      try {
+        await post("/api/update/install", { path: pth });
+        toast("安装器已启动，应用将自动退出并在安装完成后重启", "ok");
+      } catch (e) { toast(e.message, "err"); }
+    }
+    setInterval(async () => {
+      try {
+        if (S.updInstallerPath) return;                  // 已就绪，不再轮询
+        try {
+          const dk = await api("/api/update/downloaded");
+          if (dk.path) { S.updInstallerPath = dk.path; updReadyUI(dk.path); return; }
+        } catch (e) { /* 忽略 */ }
+        const d = await api("/api/downloads");
+        const hit = (d.downloads || []).find(x =>
+          x.state === "done" && /^mcmodxz-.*\.exe$/i.test(x.name || "")
+          && !x.name.includes("安装程序-v"));               // 排除历史手动下载
+        if (hit && hit.path) { S.updInstallerPath = hit.path; updReadyUI(hit.path); }
+      } catch (e) { /* 轮询失败忽略 */ }
+    }, 3000);
+    if (location.hash === "#nexus") {
+      const tab = document.querySelector('.tab[data-src="nexus"]');
+      if (tab) tab.click();
+    } else if (location.hash === "#settings") {
+      openSettings();
+    }
+  } catch (e) { toast("初始化失败：" + e.message, "err"); }
+})();
+</script>
+</body>
+</html>
