@@ -1,0 +1,37 @@
+# ---- 运行时生成，不入库 ----
+data/
+downloads/
+exports/
+dist/
+build/
+dist_update/
+*.spec
+
+# ---- 缓存 ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# ---- 本地配置与密钥（务必不要提交） ----
+.gitee_token
+scripts/.gitee_token
+*.token
+*.secret
+.env
+.env.*
+
+# ---- 探测/临时产物 ----
+_probe_*.json
+_probe_*.html
+shots/
+*.log
+*.db
+*.db-wal
+*.db-shm
+
+# ---- 系统 ----
+Thumbs.db
+desktop.ini
+.DS_Store
+.idea/
+.vscode/
